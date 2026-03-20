@@ -60,6 +60,7 @@
 
     environment = {
       SSH_AUTH_SOCK = "/run/user/1000/keyring/ssh";
+      NIXOS_OZONE_WL = "1";
       XDG_CURRENT_DESKTOP = "niri";
       XDG_SESSION_DESKTOP = "niri";
       QT_QPA_PLATFORMTHEME = "gtk3";
