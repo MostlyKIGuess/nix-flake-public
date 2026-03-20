@@ -85,6 +85,9 @@
 
     gestures.hot-corners.enable = false;
 
-    debug.honor-xdg-activation-with-invalid-serial = true;
+    debug = {
+      honor-xdg-activation-with-invalid-serial = true;
+      render-drm-device = "/dev/dri/renderD129";  # Force AMD iGPU for power saving
+    };
   };
 }
