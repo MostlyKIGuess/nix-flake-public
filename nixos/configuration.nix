@@ -64,7 +64,7 @@
     clean.enable = true;
     clean.dates = "daily";
     clean.extraArgs = "--keep-since 7d --keep 10";
-    flake = toString ./.;
+    flake = "/home/mostlyk/.dotfiles";
   };
 
   # Auto-upgrade: daily fetch, no auto-reboot (review before rebooting on Nvidia)

@@ -7,11 +7,12 @@ NixOS configuration for an AMD + Nvidia laptop running **niri** (Wayland composi
 See Structure below for where to make changes. At a minimum, you will need to:
 
 1. Replace `nixos/hardware-configuration.nix` with your own (run `nixos-generate-config`).
-2. Update GPU bus IDs in `nixos/modules/hardware/nvidia.nix`.
-3. Update monitor names/resolutions in `home-manager/modules/niri/settings.nix`.
-4. Update SSH hosts in `home-manager/modules/shell/ssh.nix`.
-5. Change `networking.hostName` in `nixos/configuration.nix`.
-6. Set your username everywhere `mostlyk` appears (a future improvement: extract this to a variable).
+2. Update your flake path in `configuration.nix` with where you cloned this repo. (ideally keeping ~/.dotfiles pattern means just swapping mostlyk for your username would work).
+3. Update GPU bus IDs in `nixos/modules/hardware/nvidia.nix`.
+4. Update monitor names/resolutions in `home-manager/modules/niri/settings.nix`.
+5. Update SSH hosts in `home-manager/modules/shell/ssh.nix`.
+6. Change `networking.hostName` in `nixos/configuration.nix`.
+7. Set your username everywhere `mostlyk` appears (a future improvement: extract this to a variable).
 
 
 ### Random Notes
