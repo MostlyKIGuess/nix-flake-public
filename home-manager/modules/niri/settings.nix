@@ -67,13 +67,6 @@
 
     spawn-at-startup = [
       { command = [ "swww-daemon" ]; }
-      {
-        command = [
-          "sh"
-          "-c"
-          "brightnessctl s $(cat ${config.home.homeDirectory}/.dotfiles/home-manager/modules/hypr/scripts/bright)"
-        ];
-      }
       { command = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
       { command = [ "xwayland-satellite" ]; }
       { command = [ "wl-paste" "--type" "text" "--watch" "cliphist" "store" ]; }

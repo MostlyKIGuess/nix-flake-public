@@ -62,8 +62,8 @@
           nil # nix LSP
         ];
         shellHook = ''
-          exec zsh
           echo "my dots dev shell :3 wohohohohoh WELCOMEEE - run 'deadnix .' or 'statix check .'"
+          exec zsh
         '';
       };
 
