@@ -35,10 +35,12 @@
     substituters = [
       "https://cache.nixos.org"
       "https://mostlyk.cachix.org"
+      "https://niri.cachix.org/"
     ];
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "mostlyk.cachix.org-1:nsaS16kwEs4fRnKYpCpOtIDzjkdOqD7rbgj0/KFku7k="
+      "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
     ];
   };
 
