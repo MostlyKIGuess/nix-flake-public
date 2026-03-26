@@ -42,6 +42,7 @@
     obsidian
     evince
     loupe
+    foliate
     # pandoc
     typst
 
