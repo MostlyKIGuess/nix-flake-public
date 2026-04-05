@@ -4,6 +4,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
+    # because unstable is slow AF
+    nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -22,10 +25,11 @@
     mostlyk-zed.url = "github:mostlykiguess/zed-nix-cache";
   };
 
-  outputs = inputs @ { self, nixpkgs, home-manager, niri-flake, noctalia, mostlyk-zed, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-small, home-manager, niri-flake, noctalia, mostlyk-zed, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      pkgs-small = import nixpkgs-small { inherit system; config.allowUnfree = true; };
     in
     {
       nixosConfigurations.mostlyk = nixpkgs.lib.nixosSystem {
@@ -38,7 +42,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit inputs mostlyk-zed; };
+            home-manager.extraSpecialArgs = { inherit inputs mostlyk-zed pkgs-small; };
             home-manager.users.mostlyk = { ... }: {
               imports = [
                 ./home-manager/home.nix

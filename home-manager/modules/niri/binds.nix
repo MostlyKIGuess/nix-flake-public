@@ -8,7 +8,7 @@ in
   programs.niri.settings.binds = with config.lib.niri.actions; {
     "Mod+Shift+Slash".action = show-hotkey-overlay;
 
-    "Mod+T".action = spawn [ "kitty" ];
+    "Mod+T".action = spawn [ "ghostty" ];
     "Mod+F".action = spawn [ "firefox" ];
     "Mod+E".action = spawn [ "nautilus" ];
 

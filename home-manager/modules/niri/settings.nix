@@ -67,7 +67,7 @@
     };
 
     spawn-at-startup = [
-      { command = [ "swww-daemon" ]; }
+      { command = [ "awww-daemon" ]; }
       { command = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
       { command = [ "xwayland-satellite" ]; }
       { command = [ "wl-paste" "--type" "text" "--watch" "cliphist" "store" ]; }
@@ -87,7 +87,7 @@
 
     debug = {
       honor-xdg-activation-with-invalid-serial = true;
-      render-drm-device = "/dev/dri/renderD129";  # Force AMD iGPU for power saving
+      render-drm-device = "/dev/dri/renderD129"; # Force AMD iGPU for power saving
     };
   };
 }

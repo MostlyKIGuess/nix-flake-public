@@ -2,7 +2,7 @@
 {
   programs.niri.enable = true;
 
-  services.xserver.displayManager.gdm.enable = true;
+  services.displayManager.gdm.enable = true;
   services.blueman.enable = true;
 
   xdg.portal.enable = true;

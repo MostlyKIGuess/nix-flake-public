@@ -1,6 +1,6 @@
-{ pkgs, mostlyk-zed, ... }:
+{ pkgs, pkgs-small, mostlyk-zed, ... }:
 {
-  home.packages = with pkgs; [
+  home.packages = with pkgs-small; [
     # CLI utilities
     fastfetch
     ncdu
@@ -17,8 +17,10 @@
     bc
     jq
     nix-prefetch-git
-    appimage-run
+    pkgs.appimage-run # not on unstable-small
     cachix
+    tldr
+    glow
 
     # Build tools
     gcc

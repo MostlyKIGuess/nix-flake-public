@@ -5,7 +5,7 @@
   environment.systemPackages = with pkgs; [
     lutris
     transmission_4-gtk
-    wineWowPackages.stable
+    wineWow64Packages.stable
     protonup-qt
   ];
 }

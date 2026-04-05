@@ -16,7 +16,7 @@
   gtk.iconTheme.name = "Papirus-Dark";
 
   home.packages = with pkgs; [
-    swww
+    awww
     playerctl
     bc
     jq

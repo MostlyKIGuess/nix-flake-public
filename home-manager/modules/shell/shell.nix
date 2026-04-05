@@ -18,7 +18,20 @@
     devenv
   ];
 
-  programs.git.enable = true;
+  programs.git = {
+    enable = true;
+    signing.format = null;
+  };
+
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+    options = {
+      navigate = true;
+      side-by-side = true;
+      line-numbers = true;
+    };
+  };
   home.file.".gitconfig".source = ./.gitconfig;
 
   programs.gh = {
@@ -45,6 +58,18 @@
 
   home.file.".p10k.zsh".source = ./.p10k.zsh;
 
+  programs.atuin = {
+    enable = true;
+    enableZshIntegration = true;
+    flags = [ "--disable-up-arrow" ];
+    settings = {
+      style = "compact";
+      inline_height = 20;
+      show_preview = true;
+      filter_mode_shell_up_key_binding = "directory";
+    };
+  };
+
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
@@ -56,13 +81,15 @@
     installBatSyntax = true;
     installVimSyntax = true;
     settings = {
+      theme = "noctalia";
       font-family = "JetBrainsMono Nerd Font";
       font-size = 20;
-      window-padding-x = 5;
+      window-padding-x = 2;
       window-padding-y = 5;
       cursor-style-blink = true;
-      working-directory = "home";
+      working-directory = "~/";
       window-inherit-working-directory = "false";
+      tab-inherit-working-directory = "false";
     };
   };
 

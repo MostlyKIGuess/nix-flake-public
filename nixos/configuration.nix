@@ -73,7 +73,7 @@
   system.autoUpgrade = {
     enable = true;
     dates = "04:00";
-    flake = toString ./.;
+    flake = "/home/mostlyk/.dotfiles";
     flags = [
       "--update-input"
       "nixpkgs"
