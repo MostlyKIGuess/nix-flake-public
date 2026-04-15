@@ -9,6 +9,7 @@
     ];
     extraConfig = ''
       set-option -sa terminal-overrides ",xterm*:Tc"
+      set -g default-terminal "screen-256color"
       set -g mouse on
 
       set-window-option -g mode-keys vi
