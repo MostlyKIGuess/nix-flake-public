@@ -58,18 +58,6 @@
 
   home.file.".p10k.zsh".source = ./.p10k.zsh;
 
-  programs.atuin = {
-    enable = true;
-    enableZshIntegration = true;
-    flags = [ "--disable-up-arrow" ];
-    settings = {
-      style = "compact";
-      inline_height = 20;
-      show_preview = true;
-      filter_mode_shell_up_key_binding = "directory";
-    };
-  };
-
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;

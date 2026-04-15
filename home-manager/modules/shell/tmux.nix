@@ -6,23 +6,6 @@
       tmuxPlugins.sensible
       tmuxPlugins.vim-tmux-navigator
       tmuxPlugins.yank
-      {
-        plugin = tmuxPlugins.rose-pine;
-        extraConfig = ''
-          set -g @rose_pine_variant 'main'
-          set -g @rose_pine_bar_bg_disable 'on'
-          set -g @rose_pine_bar_bg_disabled_color_option 'default'
-          set -g @rose_pine_host 'on'
-          set -g @rose_pine_directory 'on'
-          set -g @rose_pine_date_time '%H:%M'
-          set -g @rose_pine_hostname_icon '|'
-          set -g @rose_pine_date_time_icon '|'
-          set -g @rose_pine_left_separator ' '
-          set -g @rose_pine_right_separator ' '
-          set -g @rose_pine_field_separator ' '
-          set -g @rose_pine_window_separator ' '
-        '';
-      }
     ];
     extraConfig = ''
       set-option -sa terminal-overrides ",xterm*:Tc"
@@ -44,6 +27,20 @@
 
       bind -n M-H previous-window
       bind -n M-L next-window
+
+      # Kanagawa colors
+      set -g status-style "bg=#1f1f28,fg=#dcd7ba"
+      set -g window-status-current-style "bg=#76946a,fg=#1f1f28,bold"
+      set -g window-status-style "bg=#2a2a37,fg=#717c7c"
+      set -g pane-active-border-style "fg=#76946a"
+      set -g pane-border-style "fg=#c0a36e"
+      set -g message-style "bg=#2d4f67,fg=#c8c093"
+      set -g message-command-style "bg=#2d4f67,fg=#c8c093"
+
+      set -g status-left " #S "
+      set -g status-right " %H:%M %d-%b-%y "
+      set -g window-status-format " #I:#W "
+      set -g window-status-current-format " #I:#W "
     '';
   };
 }
