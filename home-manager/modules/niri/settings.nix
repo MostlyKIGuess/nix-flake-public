@@ -67,6 +67,7 @@
     };
 
     spawn-at-startup = [
+      { command = [ "noctalia-shell" ]; }
       { command = [ "awww-daemon" ]; }
       { command = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
       { command = [ "xwayland-satellite" ]; }

@@ -89,6 +89,7 @@
     cliphist
     grimblast
     wlogout
+    quickshell
 
   ];
 }

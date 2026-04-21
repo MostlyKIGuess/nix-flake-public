@@ -2,7 +2,6 @@
 {
   programs.noctalia-shell = {
     enable = true;
-    systemd.enable = true;
 
     settings = {
       settingsVersion = 0;
@@ -373,9 +372,5 @@
         monitorWidgets = [ ];
       };
     };
-  };
-
-  systemd.user.services.noctalia-shell = {
-    Service.Environment = "QT_QPA_PLATFORMTHEME=gtk3";
   };
 }
