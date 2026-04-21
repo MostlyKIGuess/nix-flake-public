@@ -1,4 +1,4 @@
-{ pkgs, pkgs-small, mostlyk-zed, ... }:
+{ pkgs, pkgs-small, mostlyk-zed,helium, ... }:
 {
   home.packages = with pkgs-small; [
     # CLI utilities
@@ -57,6 +57,7 @@
 
     # Development
     mostlyk-zed.packages.x86_64-linux.default
+    helium.packages.x86_64-linux.default
     gh
     vscode
     kitty

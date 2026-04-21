@@ -23,9 +23,13 @@
     };
 
     mostlyk-zed.url = "github:mostlykiguess/zed-nix-cache";
+    helium = {
+      url = "github:schembriaiden/helium-browser-nix-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-small, home-manager, niri-flake, noctalia, mostlyk-zed, ... }:
+  outputs = inputs @ { self, nixpkgs, nixpkgs-small, home-manager, niri-flake, noctalia, mostlyk-zed, helium, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -42,7 +46,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit inputs mostlyk-zed pkgs-small; };
+            home-manager.extraSpecialArgs = { inherit inputs mostlyk-zed helium pkgs-small; };
             home-manager.users.mostlyk = { ... }: {
               imports = [
                 ./home-manager/home.nix
