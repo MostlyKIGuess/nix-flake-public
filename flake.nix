@@ -4,9 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    # because unstable is slow AF
-    nixpkgs-small.url = "github:NixOS/nixpkgs/nixos-unstable-small";
-
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -27,13 +24,14 @@
       url = "github:schembriaiden/helium-browser-nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nixPiAgent.url = "github:rbright/nix-pi-agent";
   };
 
-  outputs = inputs @ { self, nixpkgs, nixpkgs-small, home-manager, niri-flake, noctalia, mostlyk-zed, helium, ... }:
+  outputs = inputs @ { self, nixpkgs, home-manager, niri-flake, noctalia, mostlyk-zed, helium, nixPiAgent, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      pkgs-small = import nixpkgs-small { inherit system; config.allowUnfree = true; };
     in
     {
       nixosConfigurations.mostlyk = nixpkgs.lib.nixosSystem {
@@ -46,7 +44,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit inputs mostlyk-zed helium pkgs-small; };
+            home-manager.extraSpecialArgs = { inherit inputs mostlyk-zed helium nixPiAgent; };
             home-manager.users.mostlyk = { ... }: {
               imports = [
                 ./home-manager/home.nix

@@ -10,11 +10,9 @@
   home.packages = with pkgs; [
     zsh-powerlevel10k
     zsh-history-substring-search
-    fzf
     zsh-fzf-tab
     eza
     zoxide
-    tmux
     devenv
   ];
 

@@ -1,6 +1,6 @@
-{ pkgs, pkgs-small, mostlyk-zed,helium, ... }:
+{ pkgs, mostlyk-zed,helium,nixPiAgent, ... }:
 {
-  home.packages = with pkgs-small; [
+  home.packages = with pkgs; [
     # CLI utilities
     fastfetch
     ncdu
@@ -71,6 +71,7 @@
     # AI
     claude-code
     opencode
+    nixPiAgent.packages.${pkgs.system}.pi-agent
 
     # System / desktop
     nautilus
@@ -86,7 +87,6 @@
     gnome-boxes
     nwg-displays
     wl-clipboard
-    cliphist
     grimblast
     wlogout
     quickshell
