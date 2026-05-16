@@ -2,7 +2,7 @@
 {
   programs.niri.settings = {
     outputs = {
-      "eDP-2" = {
+      "eDP-1" = {
         mode = { width = 1920; height = 1080; refresh = 144.0; };
         position = { x = 0; y = 0; };
       };

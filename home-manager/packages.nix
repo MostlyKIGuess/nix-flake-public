@@ -71,6 +71,7 @@
     # AI
     claude-code
     opencode
+    codex
     nixPiAgent.packages.${pkgs.system}.pi-agent
 
     # System / desktop

@@ -25,7 +25,7 @@
         identitiesOnly = true;
       };
 
-      "phoenix.rrcx.tk" = {
+      "phoenix" = {
         user = "krish.pandya";
         hostname = "phoenix.rrcx.tk";
         forwardX11 = true;
@@ -35,6 +35,8 @@
       "phoenix-intoponav" = {
         user = "intoponav";
         hostname = "phoenix.rrcx.tk";
+        forwardX11 = true;
+        forwardAgent = true;
       };
 
       "spectre.rrcx.tk" = {
