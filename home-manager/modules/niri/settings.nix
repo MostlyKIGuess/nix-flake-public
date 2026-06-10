@@ -67,7 +67,7 @@
     };
 
     spawn-at-startup = [
-      { command = [ "noctalia-shell" ]; }
+      { command = [ "noctalia" ]; }
       { command = [ "awww-daemon" ]; }
       { command = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
       { command = [ "xwayland-satellite" ]; }
@@ -88,7 +88,7 @@
 
     debug = {
       honor-xdg-activation-with-invalid-serial = true;
-      render-drm-device = "/dev/dri/renderD129"; # Force AMD iGPU for power saving
+      render-drm-device = "/dev/dri/by-path/pci-0000:06:00.0-render"; # AMD iGPU from hardware.nvidia.prime.amdgpuBusId.
     };
   };
 }

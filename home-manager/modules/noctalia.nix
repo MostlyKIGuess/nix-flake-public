@@ -1,6 +1,6 @@
 { lib, config, ... }:
 {
-  programs.noctalia-shell = {
+  programs.noctalia = {
     enable = true;
 
     settings = {
@@ -51,6 +51,7 @@
           }];
           right = [
             { id = "Tray"; }
+            { id = "VPN";  }
             { id = "NotificationHistory"; }
             { id = "Battery"; }
             { id = "Volume"; }

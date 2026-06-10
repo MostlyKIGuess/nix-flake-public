@@ -94,3 +94,4 @@ bindkey '^[j' history-substring-search-down
 if [ -f "$HOME/.conda/etc/profile.d/conda.sh" ]; then
     source "$HOME/.conda/etc/profile.d/conda.sh"
 fi
+export PATH="$HOME/.local/bin:$PATH"

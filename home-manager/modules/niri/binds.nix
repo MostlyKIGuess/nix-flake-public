@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 let
   noctalia = cmd:
-    [ "noctalia-shell" "ipc" "call" ]
+    [ "noctalia" "msg" ]
     ++ (pkgs.lib.splitString " " cmd);
 in
 {
@@ -17,16 +17,16 @@ in
     "Mod+W".action = toggle-window-floating;
     "Alt+Return".action = fullscreen-window;
 
-    "Mod+Alt+L".action.spawn = noctalia "lockScreen lock";
-    "Mod+Backspace".action.spawn = noctalia "sessionMenu toggle";
+    "Mod+Alt+L".action.spawn = noctalia "session lock";
+    "Mod+Backspace".action.spawn = noctalia "panel-toggle session";
 
-    "Mod+A".action.spawn = noctalia "launcher toggle";
-    "Mod+D".action.spawn = noctalia "launcher toggle";
+    "Mod+A".action.spawn = noctalia "panel-toggle launcher";
+    "Mod+D".action.spawn = noctalia "panel-toggle launcher";
 
-    "Mod+N".action.spawn = noctalia "controlCenter toggle";
-    "Mod+O".action.spawn = noctalia "settings toggle";
+    "Mod+N".action.spawn = noctalia "panel-toggle control-center";
+    "Mod+O".action.spawn = noctalia "settings-toggle";
 
-    "Mod+Tab".action.spawn = noctalia "launcher windows";
+    "Mod+Tab".action.spawn = noctalia "window-switcher";
 
     "Alt+Space".action = toggle-overview;
 
@@ -67,7 +67,7 @@ in
     "Mod+9".action.focus-workspace = 9;
     "Mod+0".action.focus-workspace = 10;
 
-    "Mod+V".action.spawn = noctalia "launcher clipboard";
+    "Mod+V".action.spawn = noctalia "panel-toggle clipboard";
 
     "Mod+P".action = spawn [ "sh" "-c" "grim -g \"$(slurp)\" - | wl-copy" ];
     "Mod+Alt+P".action = spawn [ "sh" "-c" "grim -g \"$(slurp -o)\" - | wl-copy" ];
@@ -93,18 +93,18 @@ in
     "XF86AudioPause".action = spawn [ "playerctl" "play-pause" ];
     "XF86AudioNext".action = spawn [ "playerctl" "next" ];
 
-    "XF86AudioRaiseVolume".action.spawn = noctalia "volume increase";
+    "XF86AudioRaiseVolume".action.spawn = noctalia "volume-up";
     "XF86AudioRaiseVolume".allow-when-locked = true;
-    "XF86AudioLowerVolume".action.spawn = noctalia "volume decrease";
+    "XF86AudioLowerVolume".action.spawn = noctalia "volume-down";
     "XF86AudioLowerVolume".allow-when-locked = true;
-    "XF86AudioMute".action.spawn = noctalia "volume muteOutput";
+    "XF86AudioMute".action.spawn = noctalia "volume-mute";
     "XF86AudioMute".allow-when-locked = true;
-    "XF86AudioMicMute".action.spawn = noctalia "volume muteInput";
+    "XF86AudioMicMute".action.spawn = noctalia "mic-mute";
     "XF86AudioMicMute".allow-when-locked = true;
 
-    "XF86MonBrightnessUp".action.spawn = noctalia "brightness increase";
+    "XF86MonBrightnessUp".action.spawn = noctalia "brightness-up";
     "XF86MonBrightnessUp".allow-when-locked = true;
-    "XF86MonBrightnessDown".action.spawn = noctalia "brightness decrease";
+    "XF86MonBrightnessDown".action.spawn = noctalia "brightness-down";
     "XF86MonBrightnessDown".allow-when-locked = true;
 
     "Mod+Shift+E".action = quit;

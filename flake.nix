@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.11";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -16,7 +17,6 @@
 
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     mostlyk-zed.url = "github:mostlykiguess/zed-nix-cache";
@@ -25,10 +25,9 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixPiAgent.url = "github:rbright/nix-pi-agent";
   };
 
-  outputs = inputs @ { self, nixpkgs, home-manager, niri-flake, noctalia, mostlyk-zed, helium, nixPiAgent, ... }:
+  outputs = inputs @ { self, nixpkgs, home-manager, niri-flake, noctalia, mostlyk-zed, helium,  ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -36,7 +35,7 @@
     {
       nixosConfigurations.mostlyk = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit inputs; };
+        specialArgs = { inherit inputs ; };
         modules = [
           ./nixos/configuration.nix
           home-manager.nixosModules.home-manager
@@ -44,7 +43,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit inputs mostlyk-zed helium nixPiAgent; };
+            home-manager.extraSpecialArgs = { inherit inputs mostlyk-zed helium ; };
             home-manager.users.mostlyk = { ... }: {
               imports = [
                 ./home-manager/home.nix

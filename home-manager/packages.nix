@@ -1,4 +1,4 @@
-{ pkgs, mostlyk-zed,helium,nixPiAgent, ... }:
+{ pkgs, mostlyk-zed,helium, ... }:
 {
   home.packages = with pkgs; [
     # CLI utilities
@@ -72,7 +72,6 @@
     claude-code
     opencode
     codex
-    nixPiAgent.packages.${pkgs.system}.pi-agent
 
     # System / desktop
     nautilus
@@ -91,6 +90,8 @@
     grimblast
     wlogout
     quickshell
+    qbittorrent
+    blender
 
   ];
 }
