@@ -54,18 +54,8 @@ alias mkdir='mkdir -p'
 # to customize prompt, run `p10k configure` or edit ~/.p10k.zsh
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
-[ -f /opt/miniconda3/etc/profile.d/conda.sh ] && source /opt/miniconda3/etc/profile.d/conda.sh
-eval "$(zoxide init zsh)"
-alias cd='z'
 
-## [Completion]
-## Completion scripts setup. Remove the following line to uninstall
-# [[ -f /home/mostlyk/.dart-cli-completion/zsh-config.zsh ]] && . /home/mostlyk/.dart-cli-completion/zsh-config.zsh || true
-## [/Completion]
-#
-#
 export DIRENV_LOG_FORMAT=""
 
 bindkey "\e[1;5D" backward-word
@@ -90,8 +80,7 @@ bindkey '^F' autosuggest-accept-word
 bindkey '^[k' history-substring-search-up
 bindkey '^[j' history-substring-search-down
 
-# Comment this out if you don't use conda or if you have a different installation path
-if [ -f "$HOME/.conda/etc/profile.d/conda.sh" ]; then
-    source "$HOME/.conda/etc/profile.d/conda.sh"
-fi
 export PATH="$HOME/.local/bin:$PATH"
+
+eval "$(zoxide init zsh)"
+alias cd='z'

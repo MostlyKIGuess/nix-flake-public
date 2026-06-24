@@ -19,6 +19,13 @@
   programs.git = {
     enable = true;
     signing.format = null;
+    settings = {
+      user.name = "mostlykiguess";
+      user.email = "bruvistrue93@gmail.com";
+      init.defaultBranch = "main";
+      core.editor = "nvim";
+      core.whitespace = "fix,-indent-with-non-tab,trailing-space,cr-at-eol";
+    };
   };
 
   programs.delta = {
@@ -30,8 +37,6 @@
       line-numbers = true;
     };
   };
-  home.file.".gitconfig".source = ./.gitconfig;
-
   programs.gh = {
     enable = true;
     gitCredentialHelper.enable = true;

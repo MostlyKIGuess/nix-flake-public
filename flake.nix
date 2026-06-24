@@ -16,7 +16,7 @@
     };
 
     noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
+      url = "github:noctalia-dev/noctalia";
     };
 
     mostlyk-zed.url = "github:mostlykiguess/zed-nix-cache";
