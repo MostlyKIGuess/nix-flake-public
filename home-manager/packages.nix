@@ -59,7 +59,6 @@
     helium.packages.x86_64-linux.default
     gh
     vscode
-    kitty
     rerun
     code2prompt
     television

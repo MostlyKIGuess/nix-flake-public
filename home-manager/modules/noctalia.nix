@@ -177,7 +177,7 @@
         pinnedApps = [ ];
         useApp2Unit = false;
         sortByMostUsed = true;
-        terminalCommand = "kitty -e";
+        terminalCommand = "ghostty";
         customLaunchPrefixEnabled = false;
         customLaunchPrefix = "";
         viewMode = "list";

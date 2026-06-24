@@ -27,7 +27,7 @@ See Structure below for where to make changes. At a minimum, you will need to:
 | OS | NixOS (nixos-unstable) |
 | WM | [niri](https://github.com/YaLTeR/niri) via [niri-flake](https://github.com/sodiboo/niri-flake) |
 | Shell / bar / lock | [Noctalia Shell](https://github.com/noctalia-dev/noctalia-shell) |
-| Terminal | Kitty + Ghostty |
+| Terminal |  Ghostty |
 | Editor | Neovim (LazyVim) + Zed |
 | Theme | Kanagawa (managed by Noctalia) |
 
@@ -78,7 +78,7 @@ statix check .     # lint for anti-patterns
     ├── packages.nix             # user packages
     └── modules/
         ├── niri/                # binds, settings, rules
-        ├── shell/               # zsh, nvim, tmux, direnv, ssh, kitty
+        ├── shell/               # zsh, nvim, tmux, direnv, ssh
         ├── programs/            # signal, zathura
         └── noctalia.nix         # Noctalia Shell settings
 ```
