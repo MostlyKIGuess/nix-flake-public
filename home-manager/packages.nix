@@ -53,7 +53,6 @@
     vesktop # discord client
     element-desktop
     slack
-    zulip
 
     # Development
     mostlyk-zed.packages.x86_64-linux.default

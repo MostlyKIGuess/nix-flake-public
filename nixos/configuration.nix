@@ -27,10 +27,6 @@
   };
 
   nixpkgs.config.allowUnfree = true;
-  # Required by pkgs.zulip until nixpkgs updates it past EOL Electron 39.
-  nixpkgs.config.permittedInsecurePackages = [
-    "electron-39.8.10"
-  ];
   nix.settings.trusted-users = [ "root" "@wheel" ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.optimise.automatic = true;
