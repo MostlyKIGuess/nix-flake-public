@@ -31,6 +31,12 @@
         forwardX11 = true;
         forwardAgent = true;
       };
+      "orion" = {
+        user = "krish.pandya";
+        hostname = "orion.rrcx.tk";
+        forwardX11 = true;
+        forwardAgent = true;
+      };
 
       "phoenix-intoponav" = {
         user = "intoponav";
