@@ -24,7 +24,6 @@
   users.users.mostlyk = {
     isNormalUser = true;
     extraGroups = [ "networkmanager" "wheel" "dialout" "docker" "libvirtd" ];
-    packages = with pkgs; [ firefox ];
   };
 
   nixpkgs.config.allowUnfree = true;

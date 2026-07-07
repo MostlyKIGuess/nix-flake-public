@@ -9,7 +9,7 @@ in
     "Mod+Shift+Slash".action = show-hotkey-overlay;
 
     "Mod+T".action = spawn [ "ghostty" ];
-    "Mod+F".action = spawn [ "helium" ];
+    "Mod+F".action = spawn [ "firefox" ];
     "Mod+E".action = spawn [ "nautilus" ];
 
     "Mod+Q".action = close-window;

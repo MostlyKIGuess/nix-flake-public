@@ -1,4 +1,4 @@
-{ pkgs, mostlyk-zed,helium, ... }:
+{ pkgs, mostlyk-zed, ... }:
 {
   home.packages = with pkgs; [
     # CLI utilities
@@ -56,8 +56,7 @@
 
     # Development
     mostlyk-zed.packages.x86_64-linux.default
-    helium.packages.x86_64-linux.default
-    gh
+    chromium # webapps app-mode shell (whatsapp/zulip)
     vscode
     rerun
     code2prompt

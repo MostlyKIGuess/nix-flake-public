@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   imports = [
     ./neovim.nix
@@ -11,8 +11,6 @@
     zsh-powerlevel10k
     zsh-history-substring-search
     zsh-fzf-tab
-    eza
-    zoxide
     devenv
   ];
 
@@ -81,22 +79,6 @@
       working-directory = "~/";
       window-inherit-working-directory = "false";
       tab-inherit-working-directory = "false";
-    };
-  };
-
-  programs.kitty = {
-    enable = true;
-    font.size = lib.mkForce 20;
-    font.name = lib.mkForce "JetBrainsMono Nerd Font";
-    shellIntegration.enableZshIntegration = true;
-    settings = {
-      enable_audio_bell = false;
-      window_padding_width = 5;
-      copy_on_select = true;
-      clipboard_control = "write-clipboard read-clipboard write-primary read-primary";
-      active_border_color = "None";
-      cursor_trail = "1";
-      include = "themes/noctalia.conf";
     };
   };
 }
