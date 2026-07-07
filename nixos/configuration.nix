@@ -12,6 +12,7 @@
   };
 
   time.timeZone = "Asia/Kolkata";
+  services.timesyncd.enable = true;
 
   services.xserver.enable = true;
   services.fwupd.enable = true;
