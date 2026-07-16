@@ -64,6 +64,12 @@
         user = "root";
         identityFile = "${config.home.homeDirectory}/.ssh/id_mostlyk";
       };
+
+      "geotrust" = {
+        hostname = "34.47.183.174";
+        user = "krish";
+        identityFile = "${config.home.homeDirectory}/.ssh/google_compute_engine";
+      };
     };
   };
 
