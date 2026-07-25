@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 {
   imports = [
     ./binds.nix
@@ -8,15 +8,12 @@
 
   programs.niri = {
     enable = true;
-    # Use the niri-flake's own unstable package rather than relying on
-    # a separate unstable nixpkgs channel.
-    package = inputs.niri-flake.packages.${pkgs.stdenv.hostPlatform.system}.niri-unstable;
+    package = pkgs.niri-unstable;
   };
 
   gtk.iconTheme.name = "Papirus-Dark";
 
   home.packages = with pkgs; [
-    awww
     playerctl
     bc
     jq
@@ -26,8 +23,7 @@
     libnotify
     slurp
     grim
-    cliphist
-    xwayland-satellite
+    xwayland-satellite-unstable
     nwg-look
   ];
 

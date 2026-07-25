@@ -7,6 +7,7 @@ let
 in
 {
   nixpkgs.overlays = [
+    inputs.niri-flake.overlays.niri
     (_final: _prev: {
       gdm = stablePkgs.gdm;
       gnome-control-center = stablePkgs.gnome-control-center;
@@ -16,7 +17,10 @@ in
     })
   ];
 
-  programs.niri.enable = true;
+  programs.niri = {
+    enable = true;
+    package = pkgs.niri-unstable;
+  };
 
   services.displayManager.gdm.enable = true;
   services.blueman.enable = true;

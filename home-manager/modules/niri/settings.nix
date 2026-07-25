@@ -1,9 +1,9 @@
-{ pkgs, config, ... }:
+{ pkgs, ... }:
 {
   programs.niri.settings = {
     outputs = {
       "eDP-1" = {
-        mode = { width = 1920; height = 1080; refresh = 144.0; };
+        mode = { width = 1920; height = 1080; refresh = 144.003; };
         position = { x = 0; y = 0; };
       };
       "HDMI-A-1" = {
@@ -67,12 +67,7 @@
     };
 
     spawn-at-startup = [
-      { command = [ "noctalia" ]; }
-      { command = [ "awww-daemon" ]; }
       { command = [ "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1" ]; }
-      { command = [ "xwayland-satellite" ]; }
-      { command = [ "wl-paste" "--type" "text" "--watch" "cliphist" "store" ]; }
-      { command = [ "wl-paste" "--type" "image" "--watch" "cliphist" "store" ]; }
     ];
 
     screenshot-path = "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png";
