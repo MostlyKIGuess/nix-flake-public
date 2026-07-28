@@ -6,6 +6,7 @@
     ./ssh.nix
     ./docker.nix
     ./gaming.nix
+    ./media.nix
   ];
 
   services.cloudflare-warp.enable = true;
