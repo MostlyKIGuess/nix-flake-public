@@ -56,7 +56,7 @@
 
     # Development
     mostlyk-zed.packages.x86_64-linux.default
-    chromium # webapps app-mode shell (whatsapp/zulip)
+    brave
     vscode
     rerun
     code2prompt

@@ -5,5 +5,6 @@
     ./services
     ./niri
     ./fonts.nix
+    ./brave.nix
   ];
 }

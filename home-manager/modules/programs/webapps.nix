@@ -6,18 +6,18 @@ in
   xdg.desktopEntries = {
     whatsapp = {
       name = "WhatsApp";
-      exec = "chromium --app=https://web.whatsapp.com";
+      exec = "brave --app=https://web.whatsapp.com";
       icon = "${papirusApps}/whatsapp.svg";
       categories = [ "Network" "InstantMessaging" ];
-      settings.StartupWMClass = "chrome-web.whatsapp.com__-Default";
+      settings.StartupWMClass = "brave-web.whatsapp.com__-Default";
     };
 
     rrc-zulip = {
       name = "RRC Zulip";
-      exec = "chromium --app=https://rrc-iiith.zulipchat.com";
+      exec = "brave --app=https://rrc-iiith.zulipchat.com";
       icon = "${papirusApps}/zulip.svg";
       categories = [ "Network" "InstantMessaging" ];
-      settings.StartupWMClass = "chrome-rrc-iiith.zulipchat.com__-Default";
+      settings.StartupWMClass = "brave-rrc-iiith.zulipchat.com__-Default";
     };
   };
 }

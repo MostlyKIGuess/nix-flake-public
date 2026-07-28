@@ -18,8 +18,17 @@
   services.fwupd.enable = true;
   services.printing.enable = true;
   services.libinput.enable = true;
-  networking.firewall.enable = true;
-  networking.firewall.trustedInterfaces = [ "docker0" ];
+  networking.firewall = {
+    enable = true;
+    trustedInterfaces = [ "docker0" ];
+    interfaces.wlp4s0 = {
+      allowedUDPPorts = [
+        53 # DNS
+        67 # DHCP
+      ];
+      allowedTCPPorts = [ 53 ]; # DNS fallback
+    };
+  };
 
   users.users.mostlyk = {
     isNormalUser = true;

@@ -1,7 +1,7 @@
 { ... }:
 {
   imports = [
-    ./firefox.nix
+    ./brave.nix
     ./signal.nix
     ./webapps.nix
     # ./zathura.nix
