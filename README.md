@@ -36,7 +36,7 @@ See Structure below for where to make changes. At a minimum, you will need to:
 
 ```bash
 # Clone
-git clone https://github.com/mostlykiguess/pubic-flake ~/.dotfiles
+git clone https://github.com/MostlyKIGuess/nix-flake-public.git ~/.dotfiles
 cd ~/.dotfiles
 
 # First build
@@ -48,6 +48,26 @@ nh os switch
 # Home-manager only
 nh home switch
 ```
+
+## Linux compute hosts
+
+`server-setup.sh` configures an Ubuntu, Fedora, or Arch Linux compute host on
+x86_64 or aarch64. It installs command-line tools into `~/.local`, installs the
+Zsh and tmux plugins, and links the managed shell, tmux, Powerlevel10k, and
+Neovim configurations from this checkout.
+
+The script backs up an existing managed destination before replacing it with a
+symlink. Backups use the suffix `.before-server-setup-YYYYmmddHHMMSS`.
+
+```bash
+git clone https://github.com/MostlyKIGuess/nix-flake-public.git ~/.dotfiles
+bash ~/.dotfiles/server-setup.sh --check
+bash ~/.dotfiles/server-setup.sh
+```
+
+Set `SERVER_SETUP_INSTALL_EDITOR=0` to omit Neovim on short-lived compute
+instances. Release tag environment variables documented by `--help` can pin
+standalone tool downloads.
 
 ## Developer tooling
 

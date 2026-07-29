@@ -5,6 +5,22 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+
+zsh_custom_directory="$HOME/.zsh_custom"
+[[ -r "$zsh_custom_directory/themes/powerlevel10k/powerlevel10k.zsh-theme" ]] &&
+  source "$zsh_custom_directory/themes/powerlevel10k/powerlevel10k.zsh-theme"
+
+autoload -Uz compinit
+compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump"
+
+[[ -r "$zsh_custom_directory/plugins/fzf-tab/fzf-tab.plugin.zsh" ]] &&
+  source "$zsh_custom_directory/plugins/fzf-tab/fzf-tab.plugin.zsh"
+[[ -r "$zsh_custom_directory/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "$zsh_custom_directory/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[[ -r "$zsh_custom_directory/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh" ]] &&
+  source "$zsh_custom_directory/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+
 # Keybindings
 bindkey -e
 bindkey "${terminfo[kcuu1]}" history-search-backward
@@ -54,8 +70,6 @@ alias mkdir='mkdir -p'
 # to customize prompt, run `p10k configure` or edit ~/.p10k.zsh
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-export PATH="$HOME/.cargo/bin:$PATH"
-
 export DIRENV_LOG_FORMAT=""
 
 bindkey "\e[1;5D" backward-word
@@ -80,7 +94,11 @@ bindkey '^F' autosuggest-accept-word
 bindkey '^[k' history-substring-search-up
 bindkey '^[j' history-substring-search-down
 
-export PATH="$HOME/.local/bin:$PATH"
+if (( $+commands[zoxide] )); then
+  eval "$(zoxide init zsh)"
+  alias cd='z'
+fi
 
-eval "$(zoxide init zsh)"
-alias cd='z'
+# This plugin must remain last because it wraps widgets defined above.
+[[ -r "$zsh_custom_directory/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+  source "$zsh_custom_directory/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"

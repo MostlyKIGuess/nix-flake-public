@@ -1,197 +1,457 @@
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
 
-# 1. dependencies
-echo "Installing system packages..."
-if command -v apt-get &> /dev/null; then
-    sudo apt-get update || echo "Warning: apt-get update had errors, continuing anyway..."
-    sudo apt-get install -y zsh tmux ripgrep curl git unzip build-essential tar cmake gettext ninja-build
-elif command -v dnf &> /dev/null; then
-    sudo dnf install -y zsh tmux ripgrep curl git unzip gcc tar cmake gettext ninja-build
-elif command -v pacman &> /dev/null; then
-    sudo pacman -Sy --noconfirm zsh tmux ripgrep curl git unzip base-devel tar cmake gettext ninja
-else
-    echo "Unsupported package manager. Please install dependencies manually."
-fi
+setup_script_name="$(basename "$0")"
+readonly setup_script_name
+readonly dotfiles_root="${SERVER_SETUP_DOTFILES_ROOT:-$HOME/.dotfiles}"
+readonly install_editor="${SERVER_SETUP_INSTALL_EDITOR:-1}"
+readonly local_binary_directory="$HOME/.local/bin"
+readonly local_option_directory="$HOME/.local/opt"
 
-# 2. Zoxide
-if ! command -v zoxide &> /dev/null; then
-    echo "Installing zoxide..."
-    curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-    export PATH="$HOME/.local/bin:$PATH"
-fi
+setup_temp_directory=""
 
-# 3. eza
-if ! command -v eza &> /dev/null; then
-    echo "Installing eza..."
-    EZA_VERSION=$(curl -s "https://api.github.com/repos/eza-community/eza/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-    if [ -n "$EZA_VERSION" ]; then
-        curl -LO "https://github.com/eza-community/eza/releases/latest/download/eza_x86_64-unknown-linux-musl.tar.gz"
-        tar xzf eza_x86_64-unknown-linux-musl.tar.gz
-        if [ -d "/usr/local/bin" ]; then
-            sudo mv eza /usr/local/bin/eza
-            sudo chmod +x /usr/local/bin/eza
-        else
-            sudo mv eza /usr/bin/eza
-            sudo chmod +x /usr/bin/eza
-        fi
-        rm eza_x86_64-unknown-linux-musl.tar.gz
+log() {
+    printf '[server-setup] %s\n' "$*"
+}
+
+warn() {
+    printf '[server-setup] warning: %s\n' "$*" >&2
+}
+
+fail() {
+    printf '[server-setup] error: %s\n' "$*" >&2
+    exit 1
+}
+
+cleanup() {
+    if [[ -n "$setup_temp_directory" && -d "$setup_temp_directory" ]]; then
+        rm -rf -- "$setup_temp_directory"
     fi
-fi
+}
 
-# 4. fzf
-if [ ! -d "$HOME/.fzf" ]; then
-    echo "Installing fzf..."
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install --all
-fi
+report_failure() {
+    local exit_status=$?
+    printf '[server-setup] error: command failed at line %s with status %s\n' \
+        "${BASH_LINENO[0]}" "$exit_status" >&2
+    exit "$exit_status"
+}
 
-# 5. yazi
-if ! command -v yazi &> /dev/null; then
-    echo "Installing yazi..."
-    YAZI_VERSION=$(curl -s "https://api.github.com/repos/sxyazi/yazi/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-    if [ -n "$YAZI_VERSION" ]; then
-        curl -LO "https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-musl.zip"
-        unzip yazi-x86_64-unknown-linux-musl.zip
-        if [ -d "/usr/local/bin" ]; then
-            sudo mv yazi-x86_64-unknown-linux-musl/yazi yazi-x86_64-unknown-linux-musl/ya /usr/local/bin/
-        else
-            sudo mv yazi-x86_64-unknown-linux-musl/yazi yazi-x86_64-unknown-linux-musl/ya /usr/bin/
-        fi
-        rm -rf yazi-x86_64-unknown-linux-musl yazi-x86_64-unknown-linux-musl.zip
+trap cleanup EXIT
+trap report_failure ERR
+
+usage() {
+    cat <<EOF
+Usage: $setup_script_name [--check]
+
+Install and configure the interactive shell tools used on Linux compute hosts.
+
+Options:
+  --check  Validate the host and managed configuration without changing it.
+  --help   Show this help.
+
+Environment:
+  SERVER_SETUP_DOTFILES_ROOT   Dotfiles checkout. Default: \$HOME/.dotfiles
+  SERVER_SETUP_INSTALL_EDITOR  Install Neovim when set to 1. Default: 1
+  SERVER_SETUP_EZA_VERSION     eza release tag override.
+  SERVER_SETUP_YAZI_VERSION    Yazi release tag override.
+  SERVER_SETUP_UV_VERSION      uv release tag override.
+  SERVER_SETUP_NVIM_VERSION    Neovim release tag override.
+  SERVER_SETUP_ZOXIDE_VERSION  zoxide release tag override.
+EOF
+}
+
+require_command() {
+    local command_name="$1"
+    command -v "$command_name" >/dev/null 2>&1 ||
+        fail "required command is unavailable: $command_name"
+}
+
+run_privileged() {
+    if (( EUID == 0 )); then
+        "$@"
+        return
     fi
-fi
 
-# 6. uv
-if ! command -v uv &> /dev/null; then
-    echo "Installing uv..."
-    curl -LO "https://github.com/astral-sh/uv/releases/latest/download/uv-x86_64-unknown-linux-musl.tar.gz"
-    tar xzf uv-x86_64-unknown-linux-musl.tar.gz
-    if [ -d "/usr/local/bin" ]; then
-        sudo mv uv-x86_64-unknown-linux-musl/uv uv-x86_64-unknown-linux-musl/uvx /usr/local/bin/
+    require_command sudo
+    sudo "$@"
+}
+
+detect_architecture() {
+    case "$(uname -m)" in
+        x86_64)
+            printf 'x86_64\n'
+            ;;
+        aarch64 | arm64)
+            printf 'aarch64\n'
+            ;;
+        *)
+            fail "unsupported CPU architecture: $(uname -m)"
+            ;;
+    esac
+}
+
+validate_host() {
+    [[ "$(uname -s)" == "Linux" ]] || fail "only Linux hosts are supported"
+    detect_architecture >/dev/null
+
+    [[ "$install_editor" == "0" || "$install_editor" == "1" ]] ||
+        fail "SERVER_SETUP_INSTALL_EDITOR must be 0 or 1"
+
+    [[ -f "$dotfiles_root/home-manager/modules/shell/.zshrc" ]] ||
+        fail "missing managed zsh configuration under $dotfiles_root"
+    [[ -f "$dotfiles_root/home-manager/modules/shell/.p10k.zsh" ]] ||
+        fail "missing Powerlevel10k configuration under $dotfiles_root"
+    [[ -f "$dotfiles_root/home-manager/modules/shell/.tmux.conf" ]] ||
+        fail "missing managed tmux configuration under $dotfiles_root"
+    [[ -d "$dotfiles_root/home-manager/modules/shell/nvim" ]] ||
+        fail "missing managed Neovim configuration under $dotfiles_root"
+
+    if ! command -v apt-get >/dev/null 2>&1 &&
+        ! command -v dnf >/dev/null 2>&1 &&
+        ! command -v pacman >/dev/null 2>&1; then
+        fail "supported package manager not found: apt-get, dnf, or pacman"
+    fi
+}
+
+install_system_packages() {
+    log "installing system packages"
+
+    if command -v apt-get >/dev/null 2>&1; then
+        run_privileged env DEBIAN_FRONTEND=noninteractive apt-get update
+        run_privileged env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            ca-certificates curl fzf git ripgrep tmux unzip xz-utils zsh
+    elif command -v dnf >/dev/null 2>&1; then
+        run_privileged dnf install -y \
+            ca-certificates curl fzf git ripgrep tmux unzip xz zsh
+    elif command -v pacman >/dev/null 2>&1; then
+        run_privileged pacman -Syu --needed --noconfirm \
+            ca-certificates curl fzf git ripgrep tmux unzip xz zsh
     else
-        sudo mv uv-x86_64-unknown-linux-musl/uv uv-x86_64-unknown-linux-musl/uvx /usr/bin/
+        fail "supported package manager not found"
     fi
-    rm -rf uv-x86_64-unknown-linux-musl uv-x86_64-unknown-linux-musl.tar.gz
-fi
+}
 
-# 7. nvim from Source
-if ! command -v nvim &> /dev/null; then
-    echo "Installing Neovim from source..."
-    rm -rf /tmp/neovim
-    git clone https://github.com/neovim/neovim /tmp/neovim
-    cd /tmp/neovim
-    git checkout stable
-    make CMAKE_BUILD_TYPE=RelWithDebInfo
-    sudo make install
-    cd -
-    rm -rf /tmp/neovim
-fi
+latest_release_tag() {
+    local repository="$1"
+    local version_override="$2"
+    local release_json
+    local release_tag
 
-# 8.  tmux
-echo "Setting up tmux..."
-cat << 'TMUXEOF' > "$HOME/.tmux.conf"
-# Plugins
-set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-sensible'
-set -g @plugin 'christoomey/vim-tmux-navigator'
-set -g @plugin 'tmux-plugins/tmux-yank'
+    if [[ -n "$version_override" ]]; then
+        release_tag="$version_override"
+    else
+        release_json="$(curl -fsSL --retry 5 \
+            "https://api.github.com/repos/$repository/releases/latest")"
+        release_tag="$(sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' \
+            <<<"$release_json")"
+        [[ -n "$release_tag" ]] ||
+            fail "could not resolve the latest release tag for $repository"
+    fi
 
-# Kanagawa Status Bar Theme
-set -g status-style "bg=#1f1f28,fg=#dcd7ba"
-set -g window-status-current-style "bg=#76946a,fg=#1f1f28,bold"
-set -g window-status-style "bg=#2a2a37,fg=#717c7c"
-set -g pane-active-border-style "fg=#76946a"
-set -g pane-border-style "fg=#c0a36e"
-set -g message-style "bg=#2d4f67,fg=#c8c093"
-set -g message-command-style "bg=#2d4f67,fg=#c8c093"
+    [[ "$release_tag" =~ ^[A-Za-z0-9._-]+$ ]] ||
+        fail "release tag contains unsupported characters: $release_tag"
+    printf '%s\n' "$release_tag"
+}
 
-set -g status-left " #S "
-set -g status-right " %H:%M %d-%b-%y "
-set -g window-status-format " #I:#W "
-set -g window-status-current-format " #I:#W "
+download_file() {
+    local source_url="$1"
+    local destination="$2"
 
-# Config
-set-option -sa terminal-overrides ",xterm*:Tc"
-set -g default-terminal "screen-256color"
-set-option -g default-shell /usr/bin/zsh
-set -g mouse on
+    curl -fL --retry 5 --retry-all-errors --connect-timeout 20 \
+        "$source_url" -o "$destination"
+    [[ -s "$destination" ]] || fail "download produced an empty file: $source_url"
+}
 
-set-window-option -g mode-keys vi
-bind-key -T copy-mode-vi v   send-keys -X begin-selection
-bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
-bind-key -T copy-mode-vi y   send-keys -X copy-selection-and-cancel
+install_eza() {
+    command -v eza >/dev/null 2>&1 && return
 
-bind '"' split-window -v -c "#{pane_current_path}"
-bind %   split-window -h -c "#{pane_current_path}"
-bind Enter split-window -h -c "#{pane_current_path}"
+    local architecture
+    local release_tag
+    local target
+    local tool_directory
 
-set -g base-index 1
-set -g pane-base-index 1
-set-window-option -g pane-base-index 1
-set-option -g renumber-windows on
+    architecture="$(detect_architecture)"
+    release_tag="$(latest_release_tag eza-community/eza "${SERVER_SETUP_EZA_VERSION:-}")"
+    target="$architecture-unknown-linux-gnu"
+    tool_directory="$setup_temp_directory/eza"
+    mkdir -p "$tool_directory"
 
-bind -n M-H previous-window
-bind -n M-L next-window
+    log "installing eza $release_tag"
+    download_file \
+        "https://github.com/eza-community/eza/releases/download/$release_tag/eza_$target.tar.gz" \
+        "$tool_directory/eza.tar.gz"
+    tar -xzf "$tool_directory/eza.tar.gz" -C "$tool_directory"
+    [[ -x "$tool_directory/eza" ]] || fail "eza archive did not contain eza"
+    install -m 0755 "$tool_directory/eza" "$local_binary_directory/eza"
+}
 
-run '~/.tmux/plugins/tpm/tpm'
-TMUXEOF
+install_yazi() {
+    command -v yazi >/dev/null 2>&1 && command -v ya >/dev/null 2>&1 && return
 
-if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-fi
+    local architecture
+    local release_tag
+    local target
+    local tool_directory
 
-# 9. LazyVim
-echo "Setting up Neovim configuration (LazyVim)..."
-if [ ! -d "$HOME/.config/nvim" ]; then
-    git clone https://github.com/LazyVim/starter ~/.config/nvim
-    rm -rf ~/.config/nvim/.git
-fi
+    architecture="$(detect_architecture)"
+    release_tag="$(latest_release_tag sxyazi/yazi "${SERVER_SETUP_YAZI_VERSION:-}")"
+    target="$architecture-unknown-linux-gnu"
+    tool_directory="$setup_temp_directory/yazi"
+    mkdir -p "$tool_directory"
 
-# 10. Zsh Plugins
-echo "Setting up Zsh and plugins..."
-ZSH_CUSTOM="$HOME/.zsh_custom"
-mkdir -p "$ZSH_CUSTOM/plugins"
-mkdir -p "$ZSH_CUSTOM/themes"
+    log "installing Yazi $release_tag"
+    download_file \
+        "https://github.com/sxyazi/yazi/releases/download/$release_tag/yazi-$target.zip" \
+        "$tool_directory/yazi.zip"
+    unzip -q "$tool_directory/yazi.zip" -d "$tool_directory"
+    [[ -x "$tool_directory/yazi-$target/yazi" ]] ||
+        fail "Yazi archive did not contain yazi"
+    [[ -x "$tool_directory/yazi-$target/ya" ]] ||
+        fail "Yazi archive did not contain ya"
+    install -m 0755 "$tool_directory/yazi-$target/yazi" "$local_binary_directory/yazi"
+    install -m 0755 "$tool_directory/yazi-$target/ya" "$local_binary_directory/ya"
+}
 
-[ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ] && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k"
-[ ! -d "$ZSH_CUSTOM/plugins/fzf-tab" ] && git clone https://github.com/Aloxaf/fzf-tab "$ZSH_CUSTOM/plugins/fzf-tab"
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] && git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-history-substring-search" ] && git clone https://github.com/zsh-users/zsh-history-substring-search.git "$ZSH_CUSTOM/plugins/zsh-history-substring-search"
+install_uv() {
+    command -v uv >/dev/null 2>&1 && command -v uvx >/dev/null 2>&1 && return
 
-# 11. .zshrc
-if [ -f "$HOME/.dotfiles/home-manager/modules/shell/.zshrc" ]; then
-    cp "$HOME/.dotfiles/home-manager/modules/shell/.zshrc" "$HOME/.zshrc_base"
+    local architecture
+    local release_tag
+    local target
+    local tool_directory
 
-    cat << 'ZSHRCEOF' > "$HOME/.zshrc"
-# Ensure local bin is in PATH for zoxide and other tools
-export PATH="$HOME/.local/bin:$PATH"
+    architecture="$(detect_architecture)"
+    release_tag="$(latest_release_tag astral-sh/uv "${SERVER_SETUP_UV_VERSION:-}")"
+    target="$architecture-unknown-linux-gnu"
+    tool_directory="$setup_temp_directory/uv"
+    mkdir -p "$tool_directory"
 
-# Powerlevel10k theme
-source ~/.zsh_custom/themes/powerlevel10k/powerlevel10k.zsh-theme
+    log "installing uv $release_tag"
+    download_file \
+        "https://github.com/astral-sh/uv/releases/download/$release_tag/uv-$target.tar.gz" \
+        "$tool_directory/uv.tar.gz"
+    tar -xzf "$tool_directory/uv.tar.gz" -C "$tool_directory"
+    [[ -x "$tool_directory/uv-$target/uv" ]] || fail "uv archive did not contain uv"
+    [[ -x "$tool_directory/uv-$target/uvx" ]] || fail "uv archive did not contain uvx"
+    install -m 0755 "$tool_directory/uv-$target/uv" "$local_binary_directory/uv"
+    install -m 0755 "$tool_directory/uv-$target/uvx" "$local_binary_directory/uvx"
+}
 
-# Load plugins FIRST before user config so keybinds to widgets don't fail
-source ~/.zsh_custom/plugins/fzf-tab/fzf-tab.plugin.zsh
-source ~/.zsh_custom/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-source ~/.zsh_custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source ~/.zsh_custom/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+install_zoxide() {
+    command -v zoxide >/dev/null 2>&1 && return
 
-# Base config
-source ~/.zshrc_base
-ZSHRCEOF
-fi
+    local release_tag
+    local installer_path
 
-if [ -f "$HOME/.dotfiles/home-manager/modules/shell/.p10k.zsh" ]; then
-    ln -sf "$HOME/.dotfiles/home-manager/modules/shell/.p10k.zsh" "$HOME/.p10k.zsh"
-fi
+    release_tag="$(latest_release_tag ajeetdsouza/zoxide \
+        "${SERVER_SETUP_ZOXIDE_VERSION:-}")"
+    installer_path="$setup_temp_directory/zoxide-install.sh"
 
-# default shell
-if [ "$SHELL" != "$(which zsh)" ]; then
-    echo "Changing default shell to zsh..."
-    chsh -s "$(which zsh)" || echo "Please change your shell to zsh manually using 'chsh -s \$(which zsh)'"
-fi
+    log "installing zoxide $release_tag"
+    download_file \
+        "https://raw.githubusercontent.com/ajeetdsouza/zoxide/$release_tag/install.sh" \
+        "$installer_path"
+    bash "$installer_path"
+    command -v zoxide >/dev/null 2>&1 ||
+        fail "zoxide installation completed without an executable on PATH"
+}
 
-echo "Setup complete! Please log out and log back in, or run 'zsh' to start using your new environment."
-echo "Note: Press 'Prefix + I' in tmux to install tmux plugins the first time you open it."
+install_neovim() {
+    [[ "$install_editor" == "0" ]] && return
+    command -v nvim >/dev/null 2>&1 && return
+
+    local architecture
+    local archive_name
+    local extracted_directory
+    local install_directory
+    local release_tag
+    local tool_directory
+
+    architecture="$(detect_architecture)"
+    case "$architecture" in
+        x86_64)
+            archive_name="nvim-linux-x86_64.tar.gz"
+            extracted_directory="nvim-linux-x86_64"
+            ;;
+        aarch64)
+            archive_name="nvim-linux-arm64.tar.gz"
+            extracted_directory="nvim-linux-arm64"
+            ;;
+    esac
+
+    release_tag="$(latest_release_tag neovim/neovim "${SERVER_SETUP_NVIM_VERSION:-}")"
+    tool_directory="$setup_temp_directory/neovim"
+    install_directory="$local_option_directory/neovim-$release_tag"
+    mkdir -p "$tool_directory"
+
+    log "installing Neovim $release_tag"
+    download_file \
+        "https://github.com/neovim/neovim/releases/download/$release_tag/$archive_name" \
+        "$tool_directory/neovim.tar.gz"
+    tar -xzf "$tool_directory/neovim.tar.gz" -C "$tool_directory"
+    [[ -x "$tool_directory/$extracted_directory/bin/nvim" ]] ||
+        fail "Neovim archive did not contain nvim"
+
+    if [[ ! -d "$install_directory" ]]; then
+        mv "$tool_directory/$extracted_directory" "$install_directory"
+    fi
+    ln -sfn "$install_directory/bin/nvim" "$local_binary_directory/nvim"
+}
+
+clone_repository() {
+    local repository_url="$1"
+    local destination="$2"
+
+    if [[ -d "$destination" ]]; then
+        git -C "$destination" rev-parse --is-inside-work-tree >/dev/null 2>&1 ||
+            fail "existing plugin directory is not a valid Git checkout: $destination"
+        return
+    fi
+
+    git clone --depth 1 "$repository_url" "$destination"
+}
+
+backup_and_link() {
+    local source_path="$1"
+    local destination_path="$2"
+    local backup_path
+
+    [[ -e "$source_path" ]] || fail "managed configuration does not exist: $source_path"
+    mkdir -p "$(dirname "$destination_path")"
+
+    if [[ -L "$destination_path" ]] &&
+        [[ "$(readlink -f "$destination_path")" == "$(readlink -f "$source_path")" ]]; then
+        return
+    fi
+
+    if [[ -e "$destination_path" || -L "$destination_path" ]]; then
+        backup_path="$destination_path.before-server-setup-$(date +%Y%m%d%H%M%S)"
+        log "backing up $destination_path to $backup_path"
+        mv "$destination_path" "$backup_path"
+    fi
+
+    ln -s "$source_path" "$destination_path"
+}
+
+install_shell_plugins() {
+    local zsh_custom_directory="$HOME/.zsh_custom"
+
+    mkdir -p "$zsh_custom_directory/plugins" "$zsh_custom_directory/themes"
+    clone_repository https://github.com/romkatv/powerlevel10k.git \
+        "$zsh_custom_directory/themes/powerlevel10k"
+    clone_repository https://github.com/Aloxaf/fzf-tab.git \
+        "$zsh_custom_directory/plugins/fzf-tab"
+    clone_repository https://github.com/zsh-users/zsh-autosuggestions.git \
+        "$zsh_custom_directory/plugins/zsh-autosuggestions"
+    clone_repository https://github.com/zsh-users/zsh-syntax-highlighting.git \
+        "$zsh_custom_directory/plugins/zsh-syntax-highlighting"
+    clone_repository https://github.com/zsh-users/zsh-history-substring-search.git \
+        "$zsh_custom_directory/plugins/zsh-history-substring-search"
+    clone_repository https://github.com/tmux-plugins/tpm.git \
+        "$HOME/.tmux/plugins/tpm"
+}
+
+install_managed_configuration() {
+    local shell_directory="$dotfiles_root/home-manager/modules/shell"
+
+    zsh -n "$shell_directory/.zshrc"
+    backup_and_link "$shell_directory/.zshrc" "$HOME/.zshrc"
+    backup_and_link "$shell_directory/.p10k.zsh" "$HOME/.p10k.zsh"
+    backup_and_link "$shell_directory/.tmux.conf" "$HOME/.tmux.conf"
+    backup_and_link "$shell_directory/nvim" "$HOME/.config/nvim"
+}
+
+validate_tmux_configuration() {
+    local validation_socket="server-setup-validation-$$"
+
+    tmux -L "$validation_socket" -f "$HOME/.tmux.conf" \
+        new-session -d -s validation
+    tmux -L "$validation_socket" kill-server
+}
+
+configure_default_shell() {
+    local zsh_path
+
+    zsh_path="$(command -v zsh)"
+    if [[ "${SHELL:-}" == "$zsh_path" ]]; then
+        return
+    fi
+
+    if ! command -v chsh >/dev/null 2>&1; then
+        warn "chsh is unavailable; set the login shell manually to $zsh_path"
+        return
+    fi
+
+    if ! chsh -s "$zsh_path"; then
+        warn "could not change the login shell; run: chsh -s $zsh_path"
+    fi
+}
+
+validate_installation() {
+    local required_commands=(curl eza fzf git rg tmux uv uvx ya yazi zoxide zsh)
+    local command_name
+
+    if [[ "$install_editor" == "1" ]]; then
+        required_commands+=(nvim)
+    fi
+
+    for command_name in "${required_commands[@]}"; do
+        require_command "$command_name"
+    done
+
+    zsh -n "$HOME/.zshrc"
+    validate_tmux_configuration
+}
+
+main() {
+    local check_only=0
+
+    if (( $# > 1 )); then
+        usage >&2
+        exit 64
+    fi
+
+    case "${1:-}" in
+        "")
+            ;;
+        --check)
+            check_only=1
+            ;;
+        --help)
+            usage
+            return
+            ;;
+        *)
+            usage >&2
+            exit 64
+            ;;
+    esac
+
+    validate_host
+    if (( check_only == 1 )); then
+        log "host and managed configuration passed preflight"
+        return
+    fi
+
+    setup_temp_directory="$(mktemp -d)"
+    install_system_packages
+    export PATH="$local_binary_directory:$PATH"
+    mkdir -p "$local_binary_directory" "$local_option_directory"
+
+    install_eza
+    install_yazi
+    install_uv
+    install_zoxide
+    install_neovim
+    install_shell_plugins
+    install_managed_configuration
+    validate_installation
+    configure_default_shell
+
+    log "setup complete"
+    log "start a new login session or run: exec zsh -l"
+    log "inside tmux, press prefix + I once to install plugins"
+}
+
+main "$@"
