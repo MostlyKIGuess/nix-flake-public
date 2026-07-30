@@ -371,8 +371,10 @@ validate_tmux_configuration() {
 }
 
 configure_default_shell() {
+    local login_user
     local zsh_path
 
+    login_user="$(id -un)"
     zsh_path="$(command -v zsh)"
     if [[ "${SHELL:-}" == "$zsh_path" ]]; then
         return
@@ -383,8 +385,8 @@ configure_default_shell() {
         return
     fi
 
-    if ! chsh -s "$zsh_path"; then
-        warn "could not change the login shell; run: chsh -s $zsh_path"
+    if ! run_privileged chsh -s "$zsh_path" "$login_user"; then
+        warn "could not change the login shell; run: sudo chsh -s $zsh_path $login_user"
     fi
 }
 
