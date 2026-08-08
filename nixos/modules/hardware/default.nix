@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   imports = [
+    ./crashdiag.nix
     ./nvidia.nix
     ./pstate.nix
     ./zenpower.nix

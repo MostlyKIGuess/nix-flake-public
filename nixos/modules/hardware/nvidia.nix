@@ -3,10 +3,10 @@
   hardware.nvidia = {
     powerManagement = {
       enable = true;
-      finegrained = true;
+      finegrained = false;
     };
 
-    dynamicBoost.enable = true;
+    dynamicBoost.enable = false;
     modesetting.enable = true;
 
     prime = {
