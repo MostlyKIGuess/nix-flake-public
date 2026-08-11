@@ -25,6 +25,15 @@
     open = false;
   };
 
+  boot.extraModprobeConfig = ''
+    options nvidia NVreg_DynamicPowerManagement=0x00
+  '';
+
+  services.udev.extraRules = ''
+    ACTION=="bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030000", TEST=="power/control", ATTR{power/control}="on"
+    ACTION=="bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030200", TEST=="power/control", ATTR{power/control}="on"
+  '';
+
   environment.etc."nvidia/nvidia-application-profiles-rc.d/50-limit-free-buffer-pool-in-wayland-compositors.json".text = builtins.toJSON {
     rules = [
       {
