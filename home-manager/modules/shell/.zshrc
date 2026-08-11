@@ -12,7 +12,9 @@ zsh_custom_directory="$HOME/.zsh_custom"
   source "$zsh_custom_directory/themes/powerlevel10k/powerlevel10k.zsh-theme"
 
 autoload -Uz compinit
-compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump"
+# -i skips insecure directories instead of asking a [y/n] question that the
+# instant prompt cannot answer.
+compinit -i -d "${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump"
 
 [[ -r "$zsh_custom_directory/plugins/fzf-tab/fzf-tab.plugin.zsh" ]] &&
   source "$zsh_custom_directory/plugins/fzf-tab/fzf-tab.plugin.zsh"
@@ -23,8 +25,11 @@ compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump"
 
 # Keybindings
 bindkey -e
-bindkey "${terminfo[kcuu1]}" history-search-backward
-bindkey "${terminfo[kcud1]}" history-search-forward
+zmodload -i zsh/terminfo
+[[ -n "${terminfo[kcuu1]}" ]] &&
+  bindkey "${terminfo[kcuu1]}" history-search-backward
+[[ -n "${terminfo[kcud1]}" ]] &&
+  bindkey "${terminfo[kcud1]}" history-search-forward
 #bindkey 'v' history-search-backward
 
 # History

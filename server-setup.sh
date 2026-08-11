@@ -120,13 +120,13 @@ install_system_packages() {
     if command -v apt-get >/dev/null 2>&1; then
         run_privileged env DEBIAN_FRONTEND=noninteractive apt-get update
         run_privileged env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-            ca-certificates curl fzf git ripgrep tmux unzip xz-utils zsh
+            ca-certificates curl fzf git ncurses-bin ripgrep tmux unzip xz-utils zsh
     elif command -v dnf >/dev/null 2>&1; then
         run_privileged dnf install -y \
-            ca-certificates curl fzf git ripgrep tmux unzip xz zsh
+            ca-certificates curl fzf git ncurses ripgrep tmux unzip xz zsh
     elif command -v pacman >/dev/null 2>&1; then
         run_privileged pacman -Syu --needed --noconfirm \
-            ca-certificates curl fzf git ripgrep tmux unzip xz zsh
+            ca-certificates curl fzf git ncurses ripgrep tmux unzip xz zsh
     else
         fail "supported package manager not found"
     fi
@@ -390,6 +390,28 @@ configure_default_shell() {
     fi
 }
 
+validate_terminfo() {
+    local term_name="${TERM:-}"
+
+    [[ -n "$term_name" ]] || return 0
+    command -v infocmp >/dev/null 2>&1 || return 0
+    infocmp -- "$term_name" >/dev/null 2>&1 && return 0
+
+    warn "this host has no terminfo entry for TERM=$term_name"
+    warn "zsh cannot resolve key sequences for an unknown terminal; install the entry from the client with:"
+    warn "  infocmp -x $term_name | ssh $(id -un)@$(uname -n) -- tic -x -o \\~/.terminfo /dev/stdin"
+}
+
+validate_shell_startup() {
+    local startup_output=""
+
+    startup_output="$(zsh -i -c exit 2>&1 </dev/null)" || true
+    [[ -n "$startup_output" ]] || return 0
+
+    warn "zsh wrote to the console while starting up, which trips the Powerlevel10k instant prompt:"
+    printf '%s\n' "$startup_output" >&2
+}
+
 validate_installation() {
     local required_commands=(curl eza fzf git rg tmux uv uvx ya yazi zoxide zsh)
     local command_name
@@ -404,6 +426,8 @@ validate_installation() {
 
     zsh -n "$HOME/.zshrc"
     validate_tmux_configuration
+    validate_terminfo
+    validate_shell_startup
 }
 
 main() {
