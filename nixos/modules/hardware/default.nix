@@ -2,6 +2,7 @@
 {
   imports = [
     ./crashdiag.nix
+    ./nvme.nix
     ./nvidia.nix
     ./pstate.nix
     ./zenpower.nix
