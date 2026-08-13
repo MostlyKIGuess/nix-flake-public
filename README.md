@@ -69,6 +69,23 @@ Set `SERVER_SETUP_INSTALL_EDITOR=0` to omit Neovim on short-lived compute
 instances. Release tag environment variables documented by `--help` can pin
 standalone tool downloads.
 
+### Accounts without sudo
+
+On a host where the account has neither root nor sudo, the script installs
+everything under `~/.local` and never touches the package manager. It detects
+this by itself; `--no-sudo` (or `SERVER_SETUP_NO_SUDO=1`) forces the same path
+where sudo would otherwise work.
+
+```bash
+bash ~/.dotfiles/server-setup.sh --no-sudo
+```
+
+Zsh comes from [zsh-bin](https://github.com/romkatv/zsh-bin), tmux from the
+[tmux-appimage](https://github.com/nelsonenzo/tmux-appimage) bundle, unpacked
+rather than mounted so no FUSE is needed. fzf and ripgrep come from their own
+release binaries. The host must already have `curl`, `git`, and `tar`.
+
+
 ## Developer tooling
 
 ```bash

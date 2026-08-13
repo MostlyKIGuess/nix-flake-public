@@ -1,7 +1,12 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Powerlevel10k instant prompt. Off by default: it captures console output from
+# startup and replays it, which hides real errors behind a generic warning.
+# Set this to on/quiet to re-enable; the cache below is only read when it is on.
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=off
+
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+if [[ "$POWERLEVEL9K_INSTANT_PROMPT" != off ]] &&
+  [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
@@ -93,7 +98,9 @@ bindkey '^X^E' edit-command-line
 bindkey ' ' magic-space
 
 bindkey '^[l' autosuggest-accept
-bindkey '^F' autosuggest-accept-word
+# Word-wise accept: the plugin has no autosuggest-accept-word widget, it wraps
+# forward-word (listed in ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS) instead.
+bindkey '^F' forward-word
 
 
 bindkey '^[k' history-substring-search-up
