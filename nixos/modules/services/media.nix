@@ -44,7 +44,10 @@
   users = {
     groups.media.gid = 982;
     users = {
-      mostlyk.extraGroups = [ "media" ];
+      mostlyk = {
+        extraGroups = [ "media" ];
+        homeMode = "710";
+      };
       jellyfin.extraGroups = [ "media" ];
     };
   };

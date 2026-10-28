@@ -16,13 +16,12 @@ IIIT intranet services keep working.
 
 ```bash
 warp-cli mode warp
-
-warp-cli tunnel host add cache.nixos.org
-warp-cli tunnel host add download.nvidia.com
-warp-cli tunnel host add scholar.google.com
-
-warp-cli dns fallback add iiit.ac.in
 ```
+
+Excluded hosts and DNS fallback domains live in `warp.nix` and are applied on
+boot by `warp-split-tunnel.service`. Add new ones there, not with `warp-cli`,
+or they are lost on reinstall. The service only adds, so removing a host means
+deleting it from `warp.nix` and running `warp-cli tunnel host remove <host>`.
 
 If IIIT services resolve to `10.x.x.x` addresses but traffic still goes through
 WARP, exclude the campus private range too:

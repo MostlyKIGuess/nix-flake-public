@@ -5,7 +5,7 @@
     "kernel.panic" = 20;
   };
 
-  services.journald.extraConfig = ''
-    SyncIntervalSec=20s
-  '';
+  services.journald.settings.Journal = {
+    SyncIntervalSec = "20s";
+  };
 }

@@ -1,8 +1,10 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   imports = [
     ./neovim.nix
     ./tmux.nix
+    ./herdr.nix
+    ./dictate.nix
     ./direnv.nix
     ./ssh.nix
   ];
@@ -70,7 +72,7 @@
     installBatSyntax = true;
     installVimSyntax = true;
     settings = {
-      theme = "noctalia";
+      theme = "Nord Wave";
       font-family = "JetBrainsMono Nerd Font";
       font-size = 20;
       window-padding-x = 2;

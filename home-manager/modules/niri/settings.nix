@@ -1,11 +1,20 @@
-{ pkgs, ... }:
+{ config, pkgs, lib, host, ... }:
+let
+  palette = config.programs.noctalia.customPalettes.Mostlyk.dark;
+in
 {
   programs.niri.settings = {
     outputs = {
-      "eDP-1" = {
-        mode = { width = 1920; height = 1080; refresh = 144.003; };
-        position = { x = 0; y = 0; };
-      };
+      "eDP-1" =
+        if host == "bunny" then {
+          # 14" 3K OLED, 48-120 Hz VRR panel.
+          mode = { width = 2880; height = 1800; refresh = 120.0; };
+          scale = 1.5;
+          position = { x = 0; y = 0; };
+        } else {
+          mode = { width = 1920; height = 1080; refresh = 144.003; };
+          position = { x = 0; y = 0; };
+        };
       "HDMI-A-1" = {
         mode = { width = 1920; height = 1080; refresh = 100.0; };
         position = { x = 1920; y = 0; };
@@ -47,10 +56,10 @@
 
       border = {
         enable = true;
-        width = 2;
-        active.color = "#cba6f7";
-        inactive.color = "#505050";
-        urgent.color = "#9b0000";
+        width = 0.5;
+        active.color = palette.mPrimary;
+        inactive.color = palette.mSurfaceVariant;
+        urgent.color = palette.mError;
       };
 
       shadow.enable = false;
@@ -64,6 +73,7 @@
       XDG_CURRENT_DESKTOP = "niri";
       XDG_SESSION_DESKTOP = "niri";
       QT_QPA_PLATFORMTHEME = "gtk3";
+      GSETTINGS_SCHEMA_DIR = pkgs.glib.getSchemaPath pkgs.gtk3;
     };
 
     spawn-at-startup = [
@@ -83,7 +93,10 @@
 
     debug = {
       honor-xdg-activation-with-invalid-serial = true;
-      render-drm-device = "/dev/dri/by-path/pci-0000:06:00.0-render"; # AMD iGPU from hardware.nvidia.prime.amdgpuBusId.
+    } // lib.optionalAttrs (host == "og") {
+      # AMD iGPU, from hardware.nvidia.prime.amdgpuBusId. bunny has a single
+      # Intel GPU, so niri picks the render node itself there.
+      render-drm-device = "/dev/dri/by-path/pci-0000:06:00.0-render";
     };
   };
 }

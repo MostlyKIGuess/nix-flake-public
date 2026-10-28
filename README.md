@@ -1,21 +1,38 @@
 # mostlyk's NixOS dotfiles
 
-NixOS configuration for an AMD + Nvidia laptop running **niri** (Wayland compositor) with **Noctalia Shell**.
+NixOS configuration for two laptops running niri (Wayland compositor) with
+Noctalia Shell.
+
+## Hosts
+
+| flake output | machine | hardware |
+|---|---|---|
+| `og` | ASUS | AMD Zen CPU, AMD iGPU + NVIDIA dGPU on PRIME offload |
+| `bunny` | HP | Intel Core Ultra 7 255H (Arrow Lake-H), Arc 140T iGPU, LUKS on ext4 |
+
+Both set `networking.hostName = "mostlyk"`, so `nixos-rebuild` and `nh` cannot
+infer which one to build. Always name the host explicitly, or use the `rebuild`
+alias each host defines for itself.
+
+Shared configuration lives in `nixos/` and `home-manager/`. Anything that
+differs between the two machines lives in `hosts/<name>/`. The host name is
+passed to both the NixOS and home-manager module trees as a `host` special
+argument, which is how `home-manager/modules/niri/settings.nix` picks the right
+display mode and render node.
 
 ## Customising for your machine
 
 See Structure below for where to make changes. At a minimum, you will need to:
 
-1. Replace `nixos/hardware-configuration.nix` with your own (run `nixos-generate-config`).
-2. Update your flake path in `configuration.nix` with where you cloned this repo. (ideally keeping ~/.dotfiles pattern means just swapping mostlyk for your username would work).
-3. Update GPU bus IDs in `nixos/modules/hardware/nvidia.nix`.
+1. Replace `hosts/<name>/hardware-configuration.nix` with your own (run `nixos-generate-config`).
+2. Update your flake path in `nixos/default.nix` with where you cloned this repo. (ideally keeping ~/.dotfiles pattern means just swapping mostlyk for your username would work).
+3. Update GPU bus IDs in `hosts/og/nvidia.nix`.
 4. Update monitor names/resolutions in `home-manager/modules/niri/settings.nix`.
 5. Update SSH hosts in `home-manager/modules/shell/ssh.nix`.
-6. Change `networking.hostName` in `nixos/configuration.nix`.
+6. Change `networking.hostName` in `nixos/default.nix`.
 7. Set your username everywhere `mostlyk` appears (a future improvement: extract this to a variable).
 
-
-### Random Notes
+### Random notes
 
 - Making a public nix flake was in my Bingo 2026 list, so here we are. The stack and config is bound to change based on what I like next, but noctalia and this setup has been pretty nice for me :D
 - In case you don't feel safe having my cachix, you can check out [zed-nix-cache](https://github.com/MostlyKIGuess/zed-nix-cache/) for the setup and add your own as well, it does help to have the best build times.
@@ -39,11 +56,14 @@ See Structure below for where to make changes. At a minimum, you will need to:
 git clone https://github.com/MostlyKIGuess/nix-flake-public.git ~/.dotfiles
 cd ~/.dotfiles
 
-# First build
-sudo nixos-rebuild switch --flake .#mostlyk
+# First build (name the host: og or bunny)
+sudo nixos-rebuild switch --flake .#og
 
 # Subsequent rebuilds (using nh)
-nh os switch
+nh os switch ~/.dotfiles -H og
+
+# or the per-host alias, which fills in the -H for you
+rebuild
 
 # Home-manager only
 nh home switch
@@ -101,15 +121,17 @@ statix check .     # lint for anti-patterns
 ```
 .
 ├── flake.nix
+├── hosts/
+│   ├── og/                      # ASUS: hardware-configuration, nvidia, pstate, zenpower
+│   └── bunny/                   # HP: hardware-configuration, intel
 ├── nixos/
-│   ├── configuration.nix        # host config entry point
-│   ├── hardware-configuration.nix # COPY THIS FROM YOUR SYSTEM
+│   ├── default.nix              # shared system config
 │   └── modules/
-│       ├── hardware/            # nvidia, amd pstate, zenpower
+│       ├── hardware/            # bootloader, firmware, graphics, nvme tooling
 │       ├── services/            # audio, docker, gaming, ssh, daemon
 │       ├── niri/                # system-level niri + GDM
 │       ├── fonts.nix            # single consolidated font declaration
-│       └── packages.nix         # system packages
+│       └── brave.nix
 └── home-manager/
     ├── home.nix                 # HM entry point
     ├── packages.nix             # user packages

@@ -24,6 +24,7 @@ in
     "Mod+D".action.spawn = noctalia "panel-toggle launcher";
 
     "Mod+N".action.spawn = noctalia "panel-toggle control-center";
+    "Mod+Shift+N".action.spawn = noctalia "notification-dnd-toggle";
     "Mod+O".action.spawn = noctalia "settings-toggle";
 
     "Mod+Tab".action.spawn = noctalia "window-switcher";
@@ -68,6 +69,7 @@ in
     "Mod+0".action.focus-workspace = 10;
 
     "Mod+V".action.spawn = noctalia "panel-toggle clipboard";
+    "Mod+S".action = spawn [ "dictate" ];
 
     "Mod+P".action = spawn [ "sh" "-c" "grim -g \"$(slurp)\" - | wl-copy" ];
     "Mod+Alt+P".action = spawn [ "sh" "-c" "grim -g \"$(slurp -o)\" - | wl-copy" ];

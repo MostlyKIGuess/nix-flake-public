@@ -1,20 +1,7 @@
 { inputs, pkgs, ... }:
-let
-  stablePkgs = import inputs.nixpkgs-stable {
-    system = "x86_64-linux";
-    config.allowUnfree = true;
-  };
-in
 {
   nixpkgs.overlays = [
     inputs.niri-flake.overlays.niri
-    (_final: _prev: {
-      gdm = stablePkgs.gdm;
-      gnome-control-center = stablePkgs.gnome-control-center;
-      gnome-session = stablePkgs.gnome-session;
-      gnome-shell = stablePkgs.gnome-shell;
-      mutter = stablePkgs.mutter;
-    })
   ];
 
   programs.niri = {

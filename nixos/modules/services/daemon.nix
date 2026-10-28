@@ -1,17 +1,31 @@
 { ... }:
 {
+  systemd.sleep.settings.Sleep.HibernateDelaySec = "45min";
+
   services = {
     acpid.enable = true;
 
     power-profiles-daemon.enable = false;
-    auto-cpufreq.enable = true;
+    auto-cpufreq = {
+      enable = true;
+      settings = {
+        charger = {
+          governor = "performance";
+          turbo = "always";
+        };
+        battery = {
+          governor = "powersave";
+          turbo = "auto";
+        };
+      };
+    };
 
     hardware.bolt.enable = true;
 
     logind.settings = {
       Login = {
         HandlePowerKey = "poweroff";
-        HandleLidSwitch = "hibernate";
+        HandleLidSwitch = "suspend-then-hibernate";
         HandleLidSwitchExternalPower = "suspend";
       };
     };

@@ -12,7 +12,7 @@
       "text/html" = "brave-browser.desktop";
       "application/xhtml+xml" = "brave-browser.desktop";
 
-      "application/pdf" = "org.gnome.Evince.desktop";
+      "application/pdf" = "sioyek.desktop";
 
       "image/png" = "org.gnome.Loupe.desktop";
       "image/jpeg" = "org.gnome.Loupe.desktop";

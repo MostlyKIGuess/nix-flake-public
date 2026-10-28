@@ -6,8 +6,9 @@
     ./ssh.nix
     ./docker.nix
     ./gaming.nix
+    ./optiscaler.nix
     ./media.nix
+    ./kanata.nix
+    ./warp.nix
   ];
-
-  services.cloudflare-warp.enable = true;
 }

@@ -1,0 +1,4 @@
+home-manager/modules/programs/claude/skills/** filter=git-crypt diff=git-crypt
+home-manager/modules/programs/claude/agents/** filter=git-crypt diff=git-crypt
+home-manager/modules/programs/claude/opencode/** filter=git-crypt diff=git-crypt
+home-manager/modules/programs/claude/krish-llm.md filter=git-crypt diff=git-crypt

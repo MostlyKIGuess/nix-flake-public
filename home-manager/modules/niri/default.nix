@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   imports = [
     ./binds.nix
@@ -11,7 +11,31 @@
     package = pkgs.niri-unstable;
   };
 
-  gtk.iconTheme.name = "Papirus-Dark";
+  xdg.configFile.niri-config.source = lib.mkForce (
+    pkgs.runCommand "config.kdl"
+      {
+        config = config.programs.niri.finalConfig + "\n";
+        passAsFile = [ "config" ];
+        buildInputs = [ config.programs.niri.package ];
+      }
+      ''
+        niri validate -c $configPath
+        cp $configPath $out
+      ''
+  );
+
+  gtk = {
+    enable = true;
+    theme = {
+      name = "adw-gtk3-dark";
+      package = pkgs.adw-gtk3;
+    };
+    gtk4.theme = null;
+    iconTheme = {
+      name = "Colloid-Grey-Dark";
+      package = pkgs.colloid-icon-theme.override { colorVariants = [ "grey" ]; };
+    };
+  };
 
   home.packages = with pkgs; [
     playerctl
@@ -19,7 +43,6 @@
     jq
     brightnessctl
     rofi
-    papirus-icon-theme
     libnotify
     slurp
     grim

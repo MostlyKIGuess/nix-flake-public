@@ -4,7 +4,7 @@
     {
       draw-border-with-background = false;
       geometry-corner-radius =
-        let r = 14.0; in
+        let r = 0.0; in
         { top-left = r; top-right = r; bottom-left = r; bottom-right = r; };
       clip-to-geometry = true;
     }

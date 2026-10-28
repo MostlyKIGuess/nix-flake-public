@@ -1,4 +1,4 @@
-{ pkgs, mostlyk-zed, ... }:
+{ pkgs, inputs, ... }:
 {
   home.packages = with pkgs; [
     # CLI utilities
@@ -21,6 +21,7 @@
     cachix
     tldr
     glow
+    git-crypt
 
     # Build tools
     gcc
@@ -42,9 +43,11 @@
 
     # Productivity / notes
     obsidian
-    evince
+    sioyek
     loupe
     foliate
+    poppler-utils
+    texliveFull
     # pandoc
     typst
 
@@ -53,22 +56,24 @@
     vesktop # discord client
     element-desktop
     slack
+    sox
 
     # Development
-    mostlyk-zed.packages.x86_64-linux.default
     brave
-    vscode
+    firefox
     rerun
     code2prompt
     television
     python3Packages.jupytext
     uv
+    python3
     gnome-text-editor
 
     # AI
     claude-code
     opencode
     codex
+    inputs.herdr.packages.x86_64-linux.default
 
     # System / desktop
     nautilus
@@ -89,6 +94,7 @@
     quickshell
     qbittorrent
     blender
+    cron
 
   ];
 }
