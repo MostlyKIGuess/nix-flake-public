@@ -81,6 +81,10 @@
       working-directory = "~/";
       window-inherit-working-directory = "false";
       tab-inherit-working-directory = "false";
+      keybind = [
+        "ctrl+page_up=csi:107;7u"
+        "ctrl+page_down=csi:106;7u"
+      ];
     };
   };
 }

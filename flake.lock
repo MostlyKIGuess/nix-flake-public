@@ -98,11 +98,11 @@
         "zed": "zed"
       },
       "locked": {
-        "lastModified": 1792497513,
-        "narHash": "sha256-PA+jiPSSUQpIIstlhqBQpMCVAy658UzDqV/B0RQQM6o=",
+        "lastModified": 1793180774,
+        "narHash": "sha256-53CQh4lLDUWXqS44Vqx0IEubocuniNv+SZGFP8oFrZY=",
         "owner": "mostlykiguess",
         "repo": "zed-nix-cache",
-        "rev": "218172d6cc8151a0f9fdf31ca55624592b5aae52",
+        "rev": "50f33603c51197403b7d45438cb57de6330f139c",
         "type": "github"
       },
       "original": {
@@ -389,11 +389,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1792492085,
-        "narHash": "sha256-Li9VSwT4VOYtHU6V8BUW4QesAGcyeQAaTtunj1T10iI=",
+        "lastModified": 1793177542,
+        "narHash": "sha256-e8aYAhjNPZd0x7bk90N01st5C+akD3Gjv7Hk1+VWJyM=",
         "owner": "MostlyKIGuess",
         "repo": "zed",
-        "rev": "fc0fd826fccedee884cbde2d0e0ba24c33823438",
+        "rev": "15f3430b968b620f3b2a70c6400547f6ae64a58a",
         "type": "github"
       },
       "original": {

@@ -14,9 +14,11 @@
           slck
         )
 
-        (defoverrides
-          (lalt j) (pgdn)
-          (lalt k) (pgup)
+        (defoverridesv2
+          (lalt j) (pgdn) (lsft rsft) ()
+          (lalt k) (pgup) (lsft rsft) ()
+          (lctl lalt lsft j) (lctl lsft pgdn) () ()
+          (lctl lalt lsft k) (lctl lsft pgup) () ()
         )
       '';
     };
