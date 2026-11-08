@@ -5,6 +5,7 @@
     ./tmux.nix
     ./herdr.nix
     ./dictate.nix
+    ./board.nix
     ./direnv.nix
     ./ssh.nix
   ];

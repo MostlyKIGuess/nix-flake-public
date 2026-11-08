@@ -25,6 +25,18 @@
 
     {
       matches = [
+        { app-id = "^board$"; }
+        { app-id = "^brave-127\\.0\\.0\\.1"; }
+      ];
+      open-floating = true;
+      open-maximized = false;
+      default-column-width = { fixed = 900; };
+      default-window-height = { fixed = 900; };
+      default-floating-position = { x = 32; y = 32; relative-to = "top-right"; };
+    }
+
+    {
+      matches = [
         { app-id = "pavucontrol"; }
         { app-id = "pavucontrol-qt"; }
         { app-id = "com.saivert.pwvucontrol"; }

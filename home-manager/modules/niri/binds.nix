@@ -70,6 +70,8 @@ in
 
     "Mod+V".action.spawn = noctalia "panel-toggle clipboard";
     "Mod+S".action = spawn [ "dictate" ];
+    "Mod+B".action = spawn [ "board" ];
+    "Mod+Shift+B".action = spawn [ "board-shot" ];
 
     "Mod+P".action = spawn [ "sh" "-c" "grim -g \"$(slurp)\" - | wl-copy" ];
     "Mod+Alt+P".action = spawn [ "sh" "-c" "grim -g \"$(slurp -o)\" - | wl-copy" ];

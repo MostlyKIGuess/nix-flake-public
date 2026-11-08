@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Board</title>
+<style>
+  * { box-sizing: border-box; }
+  :root { color-scheme: dark; scrollbar-color: #424242 #212121; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex;
+    background: #212121;
+    color: #ececec;
+    font: 15px/1.5 ui-sans-serif, -apple-system, system-ui, "Segoe UI", sans-serif;
+  }
+  button, select, textarea, input { font: inherit; color: inherit; }
+  select, button, input {
+    background: #2f2f2f;
+    border: 1px solid #424242;
+    border-radius: 8px;
+    padding: 5px 10px;
+  }
+  button { cursor: pointer; }
+  button:hover:not(:disabled), select:hover { background: #424242; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  input { outline: none; }
+  input:focus { border-color: #676767; }
+
+  #sidebar { width: 220px; flex: none; display: flex; flex-direction: column; background: #171717; padding: 10px; gap: 8px; }
+  #sidebar[hidden] { display: none; }
+  #sidebar-head { display: flex; gap: 6px; }
+  #new-chat { flex: 1; min-width: 0; text-align: left; font-weight: 600; }
+  #sidebar-close, #sidebar-open { flex: none; width: 34px; padding: 5px 0; }
+  #sidebar-open[hidden] { display: none; }
+  #chat-list { flex: 1; min-height: 0; overflow-y: auto; }
+  .chat-item { display: flex; align-items: center; border-radius: 8px; }
+  .chat-item:hover { background: #2f2f2f; }
+  .chat-item.current { background: #2f2f2f; }
+  .chat-open { flex: 1; min-width: 0; background: none; border: 0; text-align: left; padding: 6px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chat-open:hover:not(:disabled) { background: none; }
+  .chat-delete { flex: none; background: none; border: 0; color: #8e8e8e; padding: 2px 8px; visibility: hidden; }
+  .chat-item:hover .chat-delete, .chat-delete:focus { visibility: visible; }
+  .chat-delete:hover:not(:disabled) { color: #ef4444; background: none; }
+  #no-chats { color: #8e8e8e; font-size: 13px; padding: 6px 8px; }
+
+  main { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; }
+  #bar { display: flex; gap: 8px; padding: 8px 12px; align-items: center; flex: none; }
+  #bar .space { flex: 1; }
+  #model-picker { max-width: 260px; }
+
+  #board-pane { flex: none; height: 55%; min-height: 120px; max-height: 80%; resize: vertical; overflow: hidden; border-block: 1px solid #2f2f2f; background: #171717; }
+  #board-pane[hidden] { display: none; }
+  #board { width: 100%; height: 100%; border: 0; display: block; }
+
+  #log { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow-y: auto; padding: 16px; }
+  #welcome { margin: auto; max-width: 440px; text-align: center; color: #b4b4b4; }
+  #welcome h1 { margin: 0 0 8px; font-size: 22px; font-weight: 600; color: #ececec; }
+  #welcome p { margin: 0 0 6px; font-size: 14px; }
+  #entries { display: flex; flex-direction: column; flex: none; }
+  #welcome[hidden] { display: none; }
+  .entry { margin: 0 0 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .user { align-self: flex-end; max-width: 80%; background: #2f2f2f; border-radius: 18px; padding: 8px 14px; }
+  .note { color: #8e8e8e; font-style: italic; font-size: 13px; }
+  .error { color: #ef4444; }
+  .meta { display: flex; gap: 10px; align-items: center; color: #8e8e8e; font-size: 12px; margin-top: 4px; }
+  .show-drawing { font-size: 12px; padding: 2px 8px; }
+  #thinking { color: #b4b4b4; margin: 0 0 14px; }
+  #thinking[hidden] { display: none; }
+
+  #compose { flex: none; margin: 0 12px 12px; padding: 8px; background: #2f2f2f; border: 1px solid #424242; border-radius: 22px; }
+  #compose:focus-within { border-color: #676767; }
+  #shots { display: flex; gap: 6px; flex-wrap: wrap; padding: 2px 4px 8px; }
+  #shots:empty { display: none; }
+  .shot { position: relative; }
+  .shot img { display: block; height: 56px; max-width: 120px; object-fit: cover; border: 1px solid #424242; border-radius: 8px; }
+  .shot button { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; padding: 0; line-height: 1; border-radius: 50%; background: #171717; font-size: 12px; }
+  #compose-row { display: flex; gap: 8px; align-items: flex-end; }
+  #text { flex: 1; min-width: 0; resize: none; max-height: 200px; background: none; border: 0; outline: none; padding: 6px 4px; }
+  #text::placeholder { color: #8e8e8e; }
+  #attach { flex: none; width: 34px; height: 34px; padding: 0; border-radius: 50%; }
+  #send { flex: none; height: 34px; background: #ececec; color: #171717; border-color: #ececec; border-radius: 17px; font-weight: 600; padding: 0 16px; }
+  #send:hover:not(:disabled) { background: #ffffff; }
+
+  #keys { position: absolute; inset: 0; z-index: 2; overflow-y: auto; padding: 16px; background: #212121; }
+  #keys[hidden] { display: none; }
+  #keys-head { display: flex; justify-content: space-between; align-items: center; }
+  #keys h2 { margin: 0 0 4px; font-size: 16px; }
+  #keys p { margin: 0 0 12px; color: #8e8e8e; font-size: 13px; }
+  .key-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .key-name { width: 110px; flex: none; }
+  .key-status { width: 64px; flex: none; font-size: 12px; color: #8e8e8e; }
+  .key-status.saved { color: #10a37f; }
+  .key-row input { flex: 1; min-width: 0; }
+  #new-provider { display: grid; gap: 8px; margin-top: 8px; }
+  #keys-error { color: #ef4444; min-height: 1.5em; margin-top: 8px; }
+</style>
+</head>
+<body>
+  <aside id="sidebar">
+    <div id="sidebar-head">
+      <button id="new-chat" type="button">+ New chat</button>
+      <button id="sidebar-close" type="button" title="Hide chats" aria-label="Hide chats">&lt;</button>
+    </div>
+    <div id="chat-list"></div>
+  </aside>
+  <main>
+    <div id="bar">
+      <button id="sidebar-open" type="button" title="Show chats" aria-label="Show chats" hidden>&gt;</button>
+      <select id="model-picker" aria-label="Model"></select>
+      <span class="space"></span>
+      <button id="board-toggle" type="button" hidden>Hide drawing</button>
+      <button id="keys-toggle" type="button">Keys</button>
+    </div>
+    <div id="board-pane" hidden></div>
+    <div id="log">
+      <div id="welcome">
+        <h1>What do you want to understand?</h1>
+        <p>Paste an image with Ctrl+V, or press Mod+Shift+B to select part of your screen.</p>
+        <p>Claude Code can read and write your files in ~/learn. The other models can only create new files there.</p>
+      </div>
+      <div id="entries"></div>
+      <p id="thinking" hidden></p>
+    </div>
+    <form id="compose">
+      <div id="shots"></div>
+      <div id="compose-row">
+        <button id="attach" type="button" title="Attach an image" aria-label="Attach an image">+</button>
+        <input id="file" type="file" accept="image/*" multiple hidden>
+        <textarea id="text" rows="1" placeholder="Ask something" aria-label="Message"></textarea>
+        <button id="send" type="submit">Send</button>
+      </div>
+    </form>
+    <div id="keys" hidden>
+      <div id="keys-head">
+        <h2>Keys</h2>
+        <button id="keys-close" type="button">Back to chat</button>
+      </div>
+      <p>Saved in GNOME Keyring. Saved keys are never shown here. Claude Code uses your own login and needs no key.</p>
+      <div id="key-list"></div>
+      <h2 style="margin-top: 16px;">Add a provider</h2>
+      <p>Any service with an OpenAI-compatible chat API. Your messages and images go to it when you pick it.</p>
+      <form id="new-provider" autocomplete="off">
+        <input id="provider-name" placeholder="Name, such as mistral" aria-label="Provider name">
+        <input id="provider-url" placeholder="https://api.example.com/v1/chat/completions" aria-label="Chat completions URL">
+        <input id="provider-models" placeholder="Model names, separated by commas" aria-label="Model names">
+        <input id="provider-key" type="password" autocomplete="new-password" placeholder="API key" aria-label="API key">
+        <div><button type="submit">Add provider</button></div>
+      </form>
+      <div id="keys-error" role="alert"></div>
+    </div>
+  </main>
+<script>
+const parameters = new URLSearchParams(location.search);
+if (parameters.get("token")) {
+  sessionStorage.setItem("board-token", parameters.get("token"));
+  history.replaceState(null, "", "/");
+}
+const token = sessionStorage.getItem("board-token");
+const byId = (id) => document.getElementById(id);
+const BACKEND_LABELS = {
+  "claude-code": "Claude Code (your plan)",
+  bedrock: "Bedrock",
+  openrouter: "OpenRouter",
+  gemini: "Gemini",
+  groq: "Groq",
+};
+const MAX_IMAGE_SIDE = 2000;
+
+let shownChatId = null;
+let shownLogLength = -1;
+let shownModels = "";
+let shownChats = "";
+let shownShots = "";
+let shownBoard = null;
+let boardHidden = false;
+let waiting = false;
+let waitingSince = 0;
+let latest = null;
+const shotUrls = new Map();
+
+async function api(path, body) {
+  const response = await fetch(path, {
+    method: body ? "POST" : "GET",
+    headers: { "X-Board-Token": token || "", "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const payload = await response.json();
+  if (!response.ok) {
+    const hint = response.status === 403 ? " The board restarted, so close this window and press Mod+B." : "";
+    throw new Error((payload.error || `Request failed with ${response.status}`) + hint);
+  }
+  return payload;
+}
+
+function showError(error) {
+  const line = document.createElement("p");
+  line.className = "entry error";
+  line.textContent = error.message;
+  byId("entries").append(line);
+  byId("welcome").hidden = true;
+  byId("log").scrollTop = byId("log").scrollHeight;
+}
+
+function modelLabel(model) {
+  return model.replace(/^us\.anthropic\.claude-/, "").replace(/^anthropic\/claude-/, "");
+}
+
+function backendShortLabel(backend) {
+  return (BACKEND_LABELS[backend] || backend).replace(" (your plan)", "");
+}
+
+function scrollLogToEnd() {
+  byId("log").scrollTop = byId("log").scrollHeight;
+}
+
+function pickValue(backend, model) {
+  return JSON.stringify([backend, model]);
+}
+
+function renderModels(models) {
+  const signature = JSON.stringify(models);
+  if (signature === shownModels) {
+    return;
+  }
+  const picker = byId("model-picker");
+  const previous = picker.value || localStorage.getItem("board-pick");
+  shownModels = signature;
+  picker.replaceChildren(
+    ...Object.entries(models).map(([backend, names]) => {
+      const group = document.createElement("optgroup");
+      group.label = BACKEND_LABELS[backend] || backend;
+      group.append(...names.map((name) => new Option(`${backendShortLabel(backend)}: ${modelLabel(name)}`, pickValue(backend, name))));
+      return group;
+    })
+  );
+  if (previous && [...picker.options].some((option) => option.value === previous)) {
+    picker.value = previous;
+  }
+}
+
+function renderChatList(chats, currentId) {
+  const signature = JSON.stringify([chats, currentId]);
+  if (signature === shownChats) {
+    return;
+  }
+  shownChats = signature;
+  const list = byId("chat-list");
+  if (!chats.length) {
+    const empty = document.createElement("div");
+    empty.id = "no-chats";
+    empty.textContent = "Your chats will appear here.";
+    list.replaceChildren(empty);
+    return;
+  }
+  list.replaceChildren(
+    ...chats.map((summary) => {
+      const item = document.createElement("div");
+      item.className = summary.id === currentId ? "chat-item current" : "chat-item";
+      const open = document.createElement("button");
+      open.type = "button";
+      open.className = "chat-open";
+      open.textContent = summary.title;
+      open.title = summary.title;
+      open.addEventListener("click", () => run(() => api("/api/chats/open", { id: summary.id })));
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "chat-delete";
+      remove.textContent = "x";
+      remove.setAttribute("aria-label", `Delete ${summary.title}`);
+      remove.addEventListener("click", () => {
+        if (confirm(`Delete "${summary.title}"? Its drawings stay in ~/learn/board.`)) {
+          run(() => api("/api/chats/delete", { id: summary.id }));
+        }
+      });
+      item.append(open, remove);
+      return item;
+    })
+  );
+}
+
+function logEntry(entry) {
+  const line = document.createElement("div");
+  line.className = `entry ${entry.role}`;
+  line.textContent = entry.text;
+  if (entry.shots) {
+    line.textContent += `\n[${entry.shots} image${entry.shots > 1 ? "s" : ""}]`;
+  }
+  if (entry.role === "assistant") {
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const details = document.createElement("span");
+    details.textContent = entry.model
+      ? `${modelLabel(entry.model)}, ${entry.input_tokens ?? "?"} in, ${entry.output_tokens ?? "?"} out`
+      : "";
+    meta.append(details);
+    if (entry.board) {
+      const show = document.createElement("button");
+      show.type = "button";
+      show.className = "show-drawing";
+      show.textContent = "Show this drawing";
+      show.addEventListener("click", () => {
+        boardHidden = false;
+        renderBoard(entry.board, true);
+      });
+      meta.append(show);
+    }
+    line.append(meta);
+  }
+  return line;
+}
+
+function renderLog(chat) {
+  if (chat.id === shownChatId && chat.log.length === shownLogLength) {
+    return;
+  }
+  const isNewChat = chat.id !== shownChatId;
+  shownChatId = chat.id;
+  shownLogLength = chat.log.length;
+  byId("entries").replaceChildren(...chat.log.map(logEntry));
+  byId("welcome").hidden = chat.log.length > 0;
+  byId("log").scrollTop = byId("log").scrollHeight;
+  if (isNewChat && chat.backend && chat.model) {
+    const value = pickValue(chat.backend, chat.model);
+    if ([...byId("model-picker").options].some((option) => option.value === value)) {
+      byId("model-picker").value = value;
+    }
+  }
+}
+
+function renderBoard(name, force) {
+  const pane = byId("board-pane");
+  if (name !== shownBoard || force) {
+    if (name && name !== shownBoard) {
+      boardHidden = false;
+      const frame = document.createElement("iframe");
+      frame.id = "board";
+      frame.title = "Drawing";
+      frame.setAttribute("sandbox", "allow-scripts");
+      frame.src = `/board/${name}`;
+      pane.replaceChildren(frame);
+    }
+    shownBoard = name;
+    if (!name) {
+      pane.replaceChildren();
+    }
+  }
+  pane.hidden = !shownBoard || boardHidden;
+  const toggle = byId("board-toggle");
+  toggle.hidden = !shownBoard;
+  toggle.textContent = boardHidden ? "Show drawing" : "Hide drawing";
+}
+
+async function shotUrl(name) {
+  if (!shotUrls.has(name)) {
+    const response = await fetch(`/api/shots/${name}`, { headers: { "X-Board-Token": token || "" } });
+    if (!response.ok) {
+      throw new Error("Could not load an attached image.");
+    }
+    shotUrls.set(name, URL.createObjectURL(await response.blob()));
+  }
+  return shotUrls.get(name);
+}
+
+async function renderShots(pending) {
+  const signature = pending.join();
+  if (signature === shownShots) {
+    return;
+  }
+  shownShots = signature;
+  const items = await Promise.all(pending.map(async (name) => {
+    const holder = document.createElement("div");
+    holder.className = "shot";
+    const image = document.createElement("img");
+    image.src = await shotUrl(name);
+    image.alt = "Attached image";
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "x";
+    remove.setAttribute("aria-label", "Remove this image");
+    remove.addEventListener("click", () => run(() => api("/api/shots/delete", { name })));
+    holder.append(image, remove);
+    return holder;
+  }));
+  byId("shots").replaceChildren(...items);
+  scrollLogToEnd();
+}
+
+function renderThinking(busy) {
+  const thinking = byId("thinking");
+  thinking.hidden = !busy;
+  if (busy) {
+    const seconds = waiting ? Math.round((Date.now() - waitingSince) / 1000) : null;
+    const text = seconds === null ? "Thinking..." : `Thinking... ${seconds}s`;
+    if (thinking.textContent !== text) {
+      thinking.textContent = text;
+      byId("log").scrollTop = byId("log").scrollHeight;
+    }
+  }
+}
+
+function render(snapshot) {
+  latest = snapshot;
+  renderModels(snapshot.models);
+  renderChatList(snapshot.chats, snapshot.chat.id);
+  renderBoard(snapshot.chat.board, false);
+  renderLog(snapshot.chat);
+  renderShots(snapshot.pending).catch(showError);
+  renderThinking(waiting || snapshot.busy);
+  byId("send").disabled = waiting || snapshot.busy;
+  byId("new-chat").disabled = waiting || snapshot.busy;
+}
+
+async function run(action) {
+  try {
+    render(await action());
+  } catch (error) {
+    showError(error);
+  }
+}
+
+async function refresh() {
+  try {
+    render(await api("/api/state"));
+  } catch (error) {
+    showError(error);
+    clearInterval(poller);
+  }
+}
+
+function fitText() {
+  const text = byId("text");
+  text.style.height = "auto";
+  text.style.height = `${text.scrollHeight}px`;
+}
+
+async function send() {
+  const text = byId("text").value;
+  if (!text.trim() || waiting || !byId("model-picker").value) {
+    return;
+  }
+  const [backend, model] = JSON.parse(byId("model-picker").value);
+  waiting = true;
+  waitingSince = Date.now();
+  byId("send").disabled = true;
+  byId("text").value = "";
+  fitText();
+  renderThinking(true);
+  try {
+    render(await api("/api/chat", { backend, model, text }));
+  } catch (error) {
+    byId("text").value = text;
+    fitText();
+    const snapshot = await api("/api/state");
+    shownLogLength = -1;
+    render(snapshot);
+    if (snapshot.chat.log.at(-1)?.text !== error.message) {
+      showError(error);
+    }
+  } finally {
+    waiting = false;
+    if (latest) {
+      render(latest);
+    }
+    byId("text").focus();
+  }
+}
+
+async function imageToPngBase64(file) {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, MAX_IMAGE_SIDE / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  return canvas.toDataURL("image/png").split(",")[1];
+}
+
+function attachImages(files) {
+  for (const file of files) {
+    run(async () => api("/api/shots", { data: await imageToPngBase64(file) }));
+  }
+}
+
+document.addEventListener("paste", (event) => {
+  const images = [...event.clipboardData.items]
+    .filter((item) => item.kind === "file" && item.type.startsWith("image/"))
+    .map((item) => item.getAsFile())
+    .filter(Boolean);
+  if (images.length && byId("keys").hidden) {
+    event.preventDefault();
+    attachImages(images);
+  }
+});
+byId("attach").addEventListener("click", () => byId("file").click());
+byId("file").addEventListener("change", (event) => {
+  attachImages([...event.target.files]);
+  event.target.value = "";
+});
+byId("compose").addEventListener("submit", (event) => {
+  event.preventDefault();
+  send();
+});
+byId("text").addEventListener("input", fitText);
+byId("text").addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    send();
+  }
+});
+byId("model-picker").addEventListener("change", (event) => {
+  localStorage.setItem("board-pick", event.target.value);
+});
+byId("new-chat").addEventListener("click", () => {
+  run(() => api("/api/chats/new", {}));
+  byId("text").focus();
+});
+function setSidebarOpen(open) {
+  byId("sidebar").hidden = !open;
+  byId("sidebar-open").hidden = open;
+  localStorage.setItem("board-sidebar", open ? "open" : "closed");
+}
+byId("sidebar-close").addEventListener("click", () => setSidebarOpen(false));
+byId("sidebar-open").addEventListener("click", () => setSidebarOpen(true));
+setSidebarOpen(localStorage.getItem("board-sidebar") !== "closed");
+byId("board-toggle").addEventListener("click", () => {
+  boardHidden = !boardHidden;
+  renderBoard(shownBoard, true);
+});
+
+const keysPanel = byId("keys");
+const keyList = byId("key-list");
+const keysError = byId("keys-error");
+const newProvider = byId("new-provider");
+
+async function keysAction(path, body) {
+  keysError.textContent = "";
+  try {
+    render(await api(path, body));
+    await loadKeys();
+    return true;
+  } catch (error) {
+    keysError.textContent = error.message;
+    return false;
+  }
+}
+
+function keyRow(key) {
+  const row = document.createElement("form");
+  row.className = "key-row";
+  row.autocomplete = "off";
+
+  const name = document.createElement("span");
+  name.className = "key-name";
+  name.textContent = BACKEND_LABELS[key.name] || key.name;
+
+  const status = document.createElement("span");
+  status.className = key.stored ? "key-status saved" : "key-status";
+  status.textContent = key.stored ? "Saved" : "Missing";
+
+  const input = document.createElement("input");
+  input.type = "password";
+  input.autocomplete = "new-password";
+  input.placeholder = key.stored ? "Paste to replace" : "Paste key";
+  input.setAttribute("aria-label", `${key.name} key`);
+
+  const save = document.createElement("button");
+  save.type = "submit";
+  save.textContent = "Save";
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.textContent = "Delete";
+  remove.disabled = !key.stored && !key.custom;
+  remove.addEventListener("click", () => {
+    const question = key.custom
+      ? `Delete the ${key.name} provider and its key?`
+      : `Delete the ${key.name} key? This can't be undone.`;
+    if (confirm(question)) {
+      keysAction(key.custom ? "/api/providers/delete" : "/api/keys/delete", { name: key.name });
+    }
+  });
+
+  row.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const value = input.value;
+    input.value = "";
+    if (value.trim()) {
+      await keysAction("/api/keys", { name: key.name, value });
+    }
+  });
+
+  row.append(name, status, input, save, remove);
+  return row;
+}
+
+async function loadKeys() {
+  const { keys } = await api("/api/keys");
+  keyList.replaceChildren(...keys.map(keyRow));
+}
+
+async function setKeysOpen(open) {
+  keysPanel.hidden = !open;
+  keysError.textContent = "";
+  if (open) {
+    try {
+      await loadKeys();
+    } catch (error) {
+      keysError.textContent = error.message;
+    }
+  }
+}
+
+byId("keys-toggle").addEventListener("click", () => setKeysOpen(keysPanel.hidden));
+byId("keys-close").addEventListener("click", () => setKeysOpen(false));
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !keysPanel.hidden) {
+    setKeysOpen(false);
+  }
+});
+
+newProvider.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const fields = ["name", "url", "models", "key"].map((field) => byId(`provider-${field}`));
+  const [name, url, models, key] = fields;
+  const added = await keysAction("/api/providers", {
+    name: name.value.trim(),
+    url: url.value.trim(),
+    models: models.value.split(","),
+    key: key.value,
+  });
+  key.value = "";
+  if (added) {
+    fields.forEach((field) => { field.value = ""; });
+  }
+});
+
+const poller = setInterval(refresh, 1500);
+refresh();
+byId("text").focus();
+</script>
+</body>
+</html>
