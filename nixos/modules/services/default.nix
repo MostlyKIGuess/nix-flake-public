@@ -4,7 +4,7 @@
     ./daemon.nix
     ./audio.nix
     ./ssh.nix
-    ./docker.nix
+    ./podman.nix
     ./gaming.nix
     ./optiscaler.nix
     ./media.nix

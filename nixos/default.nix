@@ -23,14 +23,11 @@
   services.printing.enable = true;
   services.libinput.enable = true;
 
-  networking.firewall = {
-    enable = true;
-    trustedInterfaces = [ "docker0" ];
-  };
+  networking.firewall.enable = true;
 
   users.users.mostlyk = {
     isNormalUser = true;
-    extraGroups = [ "networkmanager" "wheel" "dialout" "docker" "libvirtd" ];
+    extraGroups = [ "networkmanager" "wheel" "dialout" "libvirtd" ];
   };
 
   nixpkgs.config.allowUnfree = true;
