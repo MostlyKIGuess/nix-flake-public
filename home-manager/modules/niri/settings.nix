@@ -89,7 +89,12 @@ in
       workspace-shadow.enable = false;
     };
 
-    gestures.hot-corners.enable = false;
+    gestures.hot-corners = {
+      top-left = false;
+      top-right = false;
+      bottom-left = false;
+      bottom-right = false;
+    };
 
     debug = {
       honor-xdg-activation-with-invalid-serial = true;
