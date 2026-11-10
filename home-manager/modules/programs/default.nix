@@ -1,8 +1,8 @@
 { ... }:
 {
   imports = [
-    ./brave.nix
     ./claude
+    ./default-apps.nix
     ./element.nix
     ./signal.nix
     ./sioyek.nix

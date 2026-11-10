@@ -5,6 +5,6 @@
     ./services
     ./niri
     ./fonts.nix
-    ./brave.nix
+    ./firefox.nix
   ];
 }

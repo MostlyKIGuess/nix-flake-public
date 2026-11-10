@@ -210,7 +210,7 @@
         custom_palette = "Mostlyk";
         templates = {
           builtin_ids = [ "gtk3" "gtk4" "qt" "btop" ];
-          community_ids = [ "brave" "discord" "vscode" "zed" ];
+          community_ids = [ "discord" "vscode" "zed" ];
           enable_community_templates = true;
         };
       };

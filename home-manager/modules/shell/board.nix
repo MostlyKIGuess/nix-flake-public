@@ -9,7 +9,7 @@ let
 
   boardHelpers = ''
     board_window() {
-      niri msg --json windows | jq -c 'first(.[] | select((.app_id // "") | test("^(board$|brave-127\\.0\\.0\\.1)")))'
+      niri msg --json windows | jq -c 'first(.[] | select((.app_id // "") | test("^(board$|chrom(e|ium)-127\\.0\\.0\\.1)")))'
     }
     workspace_output() {
       niri msg --json workspaces | jq -r --argjson id "$1" '.[] | select(.id == $id) | .output'
@@ -63,7 +63,7 @@ let
           notify-send -u critical "Board" "The board service is not running. Check: systemctl --user status board"
           exit 1
         fi
-        exec brave --user-data-dir="$HOME/.local/share/board-browser" --class=board \
+        exec chromium --user-data-dir="$HOME/.local/share/board-browser" --class=board \
           --app="http://127.0.0.1:4199/?token=$(cat "$tokenfile")"
       fi
       id=$(jq -r '.id' <<< "$window")

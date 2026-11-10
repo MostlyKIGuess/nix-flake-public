@@ -46,6 +46,7 @@
     sioyek
     loupe
     foliate
+    libreoffice
     poppler-utils
     texliveFull
     # pandoc
@@ -59,10 +60,8 @@
     sox
 
     # Development
-    brave
-    firefox
-    rerun
-    code2prompt
+    chromium
+    inputs.nixpkgs-stable.legacyPackages.x86_64-linux.rerun
     television
     python3Packages.jupytext
     uv
@@ -72,7 +71,7 @@
     # AI
     claude-code
     opencode
-    codex
+    inputs.nixpkgs-stable.legacyPackages.x86_64-linux.codex
     inputs.herdr.packages.x86_64-linux.default
 
     # System / desktop

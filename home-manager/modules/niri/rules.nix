@@ -26,7 +26,7 @@
     {
       matches = [
         { app-id = "^board$"; }
-        { app-id = "^brave-127\\.0\\.0\\.1"; }
+        { app-id = "^chrom(e|ium)-127\\.0\\.0\\.1"; }
       ];
       open-floating = true;
       open-maximized = false;

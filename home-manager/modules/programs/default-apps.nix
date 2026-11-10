@@ -3,16 +3,19 @@
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
-      "x-scheme-handler/http" = "brave-browser.desktop";
-      "x-scheme-handler/https" = "brave-browser.desktop";
-      "x-scheme-handler/chrome" = "brave-browser.desktop";
-      "x-scheme-handler/about" = "brave-browser.desktop";
-      "x-scheme-handler/unknown" = "brave-browser.desktop";
-      "x-scheme-handler/mailto" = "brave-browser.desktop";
-      "text/html" = "brave-browser.desktop";
-      "application/xhtml+xml" = "brave-browser.desktop";
+      "x-scheme-handler/http" = "firefox.desktop";
+      "x-scheme-handler/https" = "firefox.desktop";
+      "x-scheme-handler/chrome" = "firefox.desktop";
+      "x-scheme-handler/about" = "firefox.desktop";
+      "x-scheme-handler/unknown" = "firefox.desktop";
+      "x-scheme-handler/mailto" = "firefox.desktop";
+      "text/html" = "firefox.desktop";
+      "application/xhtml+xml" = "firefox.desktop";
 
       "application/pdf" = "sioyek.desktop";
+
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation" = "impress.desktop";
+      "application/vnd.ms-powerpoint" = "impress.desktop";
 
       "image/png" = "org.gnome.Loupe.desktop";
       "image/jpeg" = "org.gnome.Loupe.desktop";

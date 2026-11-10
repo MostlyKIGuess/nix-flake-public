@@ -1,4 +1,10 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
+let
+  stable = import inputs.nixpkgs-stable {
+    system = pkgs.stdenv.hostPlatform.system;
+    config.allowUnfree = true;
+  };
+in
 {
   programs = {
     gamemode.enable = true;
@@ -10,7 +16,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    lutris
+    stable.lutris
     transmission_4-gtk
     wineWow64Packages.stable
     protonup-qt
