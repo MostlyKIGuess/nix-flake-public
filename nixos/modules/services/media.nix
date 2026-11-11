@@ -61,7 +61,7 @@
   ];
 
   # Expose Jellyfin only through the Wi-Fi/LAN interface.
-  networking.firewall.interfaces = lib.genAttrs [ "eno1" "wlp4s0" "wlo1" ] (_: {
+  networking.firewall.interfaces = lib.genAttrs [ "eno1" "wlp4s0" "wlo1" "tailscale0" ] (_: {
     allowedTCPPorts = [
       8096 # HTTP
       8920 # HTTPS

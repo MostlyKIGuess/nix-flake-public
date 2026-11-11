@@ -10,5 +10,6 @@
     ./media.nix
     ./kanata.nix
     ./warp.nix
+    ./tailscale.nix
   ];
 }
