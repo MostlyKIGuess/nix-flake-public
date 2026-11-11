@@ -40,7 +40,8 @@ jobs:
               builtins.any (w: n == w || n == "${w}-unstable") wanted;
             pick = c: builtins.filter matches
               (c.environment.systemPackages ++ c.home-manager.users.mostlyk.home.packages ++ [ c.programs.niri.package ]);
-          in toString (map (p: p.outPath) (builtins.concatMap (h: pick hosts.${h}.config) [ "bunny" "og" ]))')
+            outputs = p: map (o: p.${o}.outPath) (p.outputs or [ "out" ]);
+          in toString (builtins.concatMap outputs (builtins.concatMap (h: pick hosts.${h}.config) [ "bunny" "og" ]))')
           echo "paths=$paths" >> "$GITHUB_OUTPUT"
 
       - uses: cachix/cachix-action@v17
