@@ -12,6 +12,8 @@ in
     ];
   };
 
+  systemd.services.tailscaled.environment.TS_DEBUG_MTU = "1200";
+
   systemd.services.tailscale-through-warp = {
     description = "Send tailscaled's own traffic through the WARP routing table";
     after = [ "tailscaled.service" "cloudflare-warp.service" ];
