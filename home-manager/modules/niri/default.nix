@@ -14,13 +14,11 @@
   xdg.configFile.niri-config.source = lib.mkForce (
     pkgs.runCommand "config.kdl"
       {
-        config = config.programs.niri.finalConfig + "\n";
-        passAsFile = [ "config" ];
         buildInputs = [ config.programs.niri.package ];
       }
       ''
-        niri validate -c $configPath
-        cp $configPath $out
+        { cat ${config.programs.niri.finalConfigFile}; echo; } > $out
+        niri validate -c $out
       ''
   );
 

@@ -12,7 +12,7 @@ NixOS on two laptops with [niri](https://github.com/YaLTeR/niri) and [Noctalia S
 ```bash
 git clone https://github.com/MostlyKIGuess/nix-flake-public.git ~/.dotfiles
 sudo nixos-rebuild switch --flake ~/.dotfiles#og   # first build
-rebuild                                            # after that
+git pull && rebuild                                # after that
 ```
 
 Both hosts are called `mostlyk`, so always name the host (`-H og` with `nh`).
@@ -30,6 +30,7 @@ and your hosts in `home-manager/modules/shell/ssh.nix`.
 ## Notes
 
 - My Claude Code skills and notes in `home-manager/modules/programs/claude/` are private and encrypted with git-crypt, so your clone only has ciphertext. The flake builds fine without them. Write your own there, or remove `./claude` from `home-manager/modules/programs/default.nix`.
-- If you don't want to trust my cachix, [zed-nix-cache](https://github.com/MostlyKIGuess/zed-nix-cache/) shows how to set up your own.
+- Every Saturday `.github/workflows/update.yml` updates the flake inputs and builds both hosts. If both build it commits `flake.lock`, so `git pull` before `rebuild` gets a tested update. It pushes niri, xwayland-satellite, herdr and opencode to my cachix (`mostlyk.cachix.org`), and [zed-nix-cache](https://github.com/MostlyKIGuess/zed-nix-cache/) pushes Zed there.
+- If you don't want to trust my cachix, remove it from `nix.settings` in `nixos/default.nix` and those packages build on your machine, or copy the workflow with your own cache name and `CACHIX_AUTH_TOKEN` secret.
 - `server-setup.sh` sets up the shell and tmux on Ubuntu, Fedora or Arch servers, with or without sudo. See `--help`.
 - A public nix flake was on my Bingo 2026 list, so here we are :D
