@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 let
   warp-cli = "${config.services.cloudflare-warp.package}/bin/warp-cli --accept-tos";
 
@@ -54,4 +54,17 @@ in
       done
     '';
   };
+
+  networking.networkmanager.dispatcherScripts = [
+    {
+      type = "basic";
+      source = pkgs.writeShellScript "warp-reconnect" ''
+        case "$1" in wl* | en*) ;; *) exit 0 ;; esac
+        [ "$2" = up ] || exit 0
+        ${warp-cli} status | ${pkgs.gnugrep}/bin/grep -q Connected || exit 0
+        ${warp-cli} disconnect
+        ${warp-cli} connect
+      '';
+    }
+  ];
 }
