@@ -29,6 +29,8 @@
     allowedTCPPorts = [ 53 ]; # DNS fallback
   };
 
+  services.tailscale.extraSetFlags = [ "--hostname=og" ];
+
   environment.shellAliases.rebuild = "nh os switch /home/mostlyk/.dotfiles -H og";
 
   system.stateVersion = "24.05";

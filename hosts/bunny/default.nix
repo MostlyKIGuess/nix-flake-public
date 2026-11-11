@@ -21,6 +21,8 @@
     "ipv6.dhcp-send-hostname" = false;
   };
 
+  services.tailscale.extraSetFlags = [ "--hostname=bunny" ];
+
   environment.shellAliases.rebuild = "nh os switch /home/mostlyk/.dotfiles -H bunny";
 
   system.stateVersion = "26.05";
