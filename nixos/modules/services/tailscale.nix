@@ -12,6 +12,11 @@ in
     ];
   };
 
+  networking.hosts = {
+    "100.112.109.101" = [ "bunny" ];
+    "100.114.210.50" = [ "og" ];
+  };
+
   systemd.services.tailscaled.environment.TS_DEBUG_MTU = "1200";
 
   systemd.services.tailscale-through-warp = {
