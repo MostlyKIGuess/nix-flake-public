@@ -29,8 +29,6 @@
     allowedTCPPorts = [ 53 ]; # DNS fallback
   };
 
-  system.autoUpgrade.flake = "/home/mostlyk/.dotfiles#og";
-
   environment.shellAliases.rebuild = "nh os switch /home/mostlyk/.dotfiles -H og";
 
   system.stateVersion = "24.05";

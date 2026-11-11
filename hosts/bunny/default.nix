@@ -21,8 +21,6 @@
     "ipv6.dhcp-send-hostname" = false;
   };
 
-  system.autoUpgrade.flake = "/home/mostlyk/.dotfiles#bunny";
-
   environment.shellAliases.rebuild = "nh os switch /home/mostlyk/.dotfiles -H bunny";
 
   system.stateVersion = "26.05";

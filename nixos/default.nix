@@ -76,19 +76,5 @@
     flake = "/home/mostlyk/.dotfiles";
   };
 
-  # Auto-upgrade: daily fetch, no auto-reboot.
-  # `flake` is set per host, because both machines share a hostname and
-  # nixos-rebuild would otherwise not know which config to build.
-  system.autoUpgrade = {
-    enable = true;
-    dates = "04:00";
-    flags = [
-      "--update-input"
-      "nixpkgs"
-      "--commit-lock-file"
-    ];
-    allowReboot = false;
-  };
-
   virtualisation.libvirtd.enable = true;
 }
