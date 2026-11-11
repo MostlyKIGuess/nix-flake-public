@@ -1,0 +1,61 @@
+name: Update and cache
+
+on:
+  schedule:
+    - cron: "30 20 * * 6"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost /usr/local/.ghcup
+          sudo docker image prune --all --force
+          df -h /
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+            extra-substituters = https://niri.cachix.org https://noctalia.cachix.org
+            extra-trusted-public-keys = niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964= noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4=
+
+      - name: Update flake inputs
+        run: nix flake update
+
+      - name: Find packages to cache
+        id: paths
+        run: |
+          paths=$(nix eval --raw .#nixosConfigurations --apply 'hosts: let
+            wanted = [ "niri" "xwayland-satellite" "herdr" "opencode" "zed-editor" ];
+            matches = p: let n = (builtins.parseDrvName (p.name or "")).name; in
+              builtins.any (w: n == w || n == "${w}-unstable") wanted;
+            pick = c: builtins.filter matches
+              (c.environment.systemPackages ++ c.home-manager.users.mostlyk.home.packages ++ [ c.programs.niri.package ]);
+          in toString (map (p: p.outPath) (builtins.concatMap (h: pick hosts.${h}.config) [ "bunny" "og" ]))')
+          echo "paths=$paths" >> "$GITHUB_OUTPUT"
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: mostlyk
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          pathsToPush: ${{ steps.paths.outputs.paths }}
+
+      - name: Build both hosts
+        run: nix build --no-link --print-build-logs .#checks.x86_64-linux.bunny .#checks.x86_64-linux.og
+
+      - name: Commit flake.lock
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add flake.lock
+          git diff --staged --quiet || git commit -m "update flake inputs"
+          git push
