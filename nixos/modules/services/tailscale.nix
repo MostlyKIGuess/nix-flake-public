@@ -6,7 +6,10 @@ in
   services.tailscale = {
     enable = true;
     openFirewall = true;
-    extraSetFlags = [ "--accept-dns=false" ];
+    extraSetFlags = [
+      "--accept-dns=false"
+      "--operator=mostlyk"
+    ];
   };
 
   systemd.services.tailscale-through-warp = {
