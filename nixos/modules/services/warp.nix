@@ -4,6 +4,7 @@ let
 
   excludedHosts = [
     "iiit.ac.in"
+    "*.iiit.ac.in"
     "courses.iiit.ac.in"
     "dining.iiit.ac.in"
     "cache.nixos.org"
