@@ -61,7 +61,7 @@
 
     # Development
     chromium
-    inputs.nixpkgs-stable.legacyPackages.x86_64-linux.rerun
+    rerun
     television
     python3Packages.jupytext
     uv
@@ -71,7 +71,7 @@
     # AI
     claude-code
     opencode
-    inputs.nixpkgs-stable.legacyPackages.x86_64-linux.codex
+    codex
     inputs.herdr.packages.x86_64-linux.default
 
     # System / desktop
