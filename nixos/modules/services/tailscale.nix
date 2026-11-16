@@ -13,8 +13,8 @@ in
   };
 
   networking.hosts = {
-    "100.112.109.101" = [ "bunny" ];
-    "100.114.210.50" = [ "og" ];
+    "100.112.109.101" = [ "bunny" "bunny.tail5933ee.ts.net" ];
+    "100.114.210.50" = [ "og" "og.tail5933ee.ts.net" ];
   };
 
   systemd.services.tailscaled.environment.TS_DEBUG_MTU = "1200";
