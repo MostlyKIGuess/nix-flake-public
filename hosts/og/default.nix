@@ -10,6 +10,7 @@
     ./nvidia.nix
     ./pstate.nix
     ./zenpower.nix
+    ../../nixos/modules/services/immich.nix
   ];
 
   # GPU passthrough into containers, only meaningful on the host with the dGPU.
