@@ -10,6 +10,9 @@ in
     skills) // {
     ".claude/agents/researcher.md".source = link "agents/researcher.md";
     ".claude/krish-llm.md".source = link "krish-llm.md";
+    ".claude/CLAUDE.md".text = ''
+      @~/.claude/krish-llm.md
+    '';
   };
 
   xdg.configFile."opencode/agents/researcher.md".source = link "opencode/researcher.md";
