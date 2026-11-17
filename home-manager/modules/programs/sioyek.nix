@@ -26,4 +26,9 @@
     should_load_tutorial_when_no_other_file 0
     check_for_updates_on_startup 0
   '';
+
+  xdg.configFile."sioyek/keys_user.config".text = ''
+    copy_all_text <C-a>
+    search <C-F>
+  '';
 }
