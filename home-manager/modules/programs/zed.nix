@@ -138,6 +138,10 @@
         context = "Workspace";
         bindings.alt-shift-o = [ "projects::OpenRemote" { from_existing_connection = false; } ];
       }
+      {
+        context = "Workspace";
+        bindings.ctrl-alt-n = [ "agent::NewExternalAgentThread" { agent = "claude-acp"; } ];
+      }
     ];
 
     userTasks = [
