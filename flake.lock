@@ -92,17 +92,37 @@
         "type": "github"
       }
     },
+    "luciole": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794886061,
+        "narHash": "sha256-6o1PGZSN5Eb03550vvGAA56iMKavYt5Bc5pWfWA/R4E=",
+        "owner": "noctalia-dev",
+        "repo": "luciole",
+        "rev": "00cea101723f9dc445f36366938e53bf7671b2fa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "noctalia-dev",
+        "repo": "luciole",
+        "type": "github"
+      }
+    },
     "mostlyk-zed": {
       "inputs": {
         "flake-utils": "flake-utils",
         "zed": "zed"
       },
       "locked": {
-        "lastModified": 1794584777,
-        "narHash": "sha256-nnxdv6nTe6h/uVQ2cI/Lq+ODdE49f6qBLd47Rlr1WnE=",
+        "lastModified": 1794893774,
+        "narHash": "sha256-dU58Hgi4JVWHb0o15/G/oItv27K2YdFyUiCzgJnhGlM=",
         "owner": "mostlykiguess",
         "repo": "zed-nix-cache",
-        "rev": "224446c2d94f087f8160f3c41a2f563c8194821d",
+        "rev": "faac3ea67f54c81c033794729ffa7d7f352aebc0",
         "type": "github"
       },
       "original": {
@@ -283,6 +303,7 @@
       "inputs": {
         "herdr": "herdr",
         "home-manager": "home-manager",
+        "luciole": "luciole",
         "mostlyk-zed": "mostlyk-zed",
         "niri-flake": "niri-flake",
         "nixpkgs": "nixpkgs_2",
@@ -389,11 +410,11 @@
         "rust-overlay": "rust-overlay_2"
       },
       "locked": {
-        "lastModified": 1794580280,
-        "narHash": "sha256-V5Q19ZJKbkfI3k7G5k+g5JlaBmYUxEIIlI3kSbJzN6E=",
+        "lastModified": 1794890845,
+        "narHash": "sha256-/2wwDe+hi1KP4TkvkHp8pZHqh0ShUwbGxTHyaeTWy98=",
         "owner": "MostlyKIGuess",
         "repo": "zed",
-        "rev": "5a9acbc70553cace3de5b33af53b10d546428b33",
+        "rev": "b133a978ebec768c79d61b6e68c0490847d02826",
         "type": "github"
       },
       "original": {

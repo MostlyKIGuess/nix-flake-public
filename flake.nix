@@ -22,6 +22,11 @@
       url = "github:noctalia-dev/noctalia";
     };
 
+    luciole = {
+      url = "github:noctalia-dev/luciole";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     mostlyk-zed.url = "github:mostlykiguess/zed-nix-cache";
 
     herdr = {

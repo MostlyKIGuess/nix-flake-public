@@ -9,6 +9,7 @@
   imports = [
     ./hardware-configuration.nix
     ./intel.nix
+    ../../nixos/modules/luciole.nix
   ];
 
   boot.initrd.luks.devices."luks-7b86fea6-f837-47c3-a2f3-15ba444bbf69".device =
