@@ -15,8 +15,8 @@
         )
 
         (defoverridesv2
-          (lalt j) (pgdn) (lsft rsft) ()
-          (lalt k) (pgup) (lsft rsft) ()
+          (lalt j) (pgdn) (lsft rsft lctl rctl) ()
+          (lalt k) (pgup) (lsft rsft lctl rctl) ()
           (lctl lalt lsft j) (lctl lsft pgdn) () ()
           (lctl lalt lsft k) (lctl lsft pgup) () ()
         )
