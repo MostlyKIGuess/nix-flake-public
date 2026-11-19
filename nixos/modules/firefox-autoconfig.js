@@ -35,6 +35,8 @@ try {
     "Alt+KeyK": (window) => window.gBrowser.tabContainer.advanceSelectedTab(-1, true),
     "Alt+Shift+KeyJ": (window) => window.gBrowser.moveTabForward(),
     "Alt+Shift+KeyK": (window) => window.gBrowser.moveTabBackward(),
+    "Ctrl+Alt+KeyJ": (window) => window.gBrowser.tabContainer.advanceSelectedTab(1, true),
+    "Ctrl+Alt+KeyK": (window) => window.gBrowser.tabContainer.advanceSelectedTab(-1, true),
     "Ctrl+KeyB": toggleTabs,
     "Ctrl+Shift+KeyB": toggleRightPanel,
   };

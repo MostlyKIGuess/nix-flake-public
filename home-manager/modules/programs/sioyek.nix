@@ -30,5 +30,7 @@
   xdg.configFile."sioyek/keys_user.config".text = ''
     copy_all_text <C-a>
     search <C-F>
+    next_page <C-A-j>
+    previous_page <C-A-k>
   '';
 }
