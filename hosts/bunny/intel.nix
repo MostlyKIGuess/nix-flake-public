@@ -2,9 +2,13 @@
 {
   hardware.cpu.intel.updateMicrocode = true;
 
-  # Arc 140T (Xe-LPG+): the kernel picks the DRM driver itself; confirm with
-  # `lspci -k | grep -A3 VGA` after install and only pin a module if it guesses
-  # wrong.
+  # Arc 140T (Xe-LPG+, PCI ID 7d51).
+  # Check with `lspci -k | grep -A3 VGA`.
+  boot.kernelParams = [
+    "i915.force_probe=!7d51"
+    "xe.force_probe=7d51"
+  ];
+
   hardware.graphics.extraPackages = with pkgs; [
     intel-media-driver # VA-API (iHD)
     vpl-gpu-rt # oneVPL runtime, used by newer ffmpeg/OBS

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
   papirusApps = "${pkgs.papirus-icon-theme}/share/icons/Papirus/128x128/apps";
 in
@@ -6,7 +6,7 @@ in
   xdg.desktopEntries = {
     whatsapp = {
       name = "WhatsApp";
-      exec = "chromium --app=https://web.whatsapp.com";
+      exec = "chromium --user-data-dir=${config.home.homeDirectory}/.local/share/whatsapp-chromium --disable-gpu --app=https://web.whatsapp.com";
       icon = "${papirusApps}/whatsapp.svg";
       categories = [ "Network" "InstantMessaging" ];
       settings.StartupWMClass = "chrome-web.whatsapp.com__-Default";

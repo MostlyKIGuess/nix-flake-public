@@ -36,6 +36,7 @@
     # Media
     ffmpeg
     vlc
+    mpv
     obs-studio
     spotify
     pavucontrol
