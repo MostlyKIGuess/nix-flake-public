@@ -1,5 +1,10 @@
 { config, ... }:
 {
+  # With compression on xe, Mesa trims the unused tiles at the end of a buffer
+  # and packs the compression data right after, so the buffer is smaller than
+  # stride * height. niri rejects such buffers and noctalia dies.
+  systemd.user.services.noctalia.Service.Environment = [ "INTEL_DEBUG=noccs" ];
+
   programs.noctalia = {
     enable = true;
     systemd.enable = true;
